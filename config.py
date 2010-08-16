@@ -12,7 +12,7 @@ FRONTEND_BASEURL='http://CHANGE_THIS.ORG/imposter'
 
 # Database connection strings, example: postgres://imposter:mysecretpassword@localhost:5432/imposter
 FRONTEND_DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
-BACKEND_DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
+ADMIN_DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
 
 # Theme
 THEME = 'default'
@@ -47,6 +47,9 @@ SECRET_KEY = 'CHANGE_THIS'
 # Frontend prefix, ie the 'posts/' in http://yourweblog.net/posts/
 FRONTEND_PREFIX=''
 
+# Admin prefix, ie the 'admin/' in http://yourweblog.net/admin/
+ADMIN_PREFIX=''
+
 # Date format to use in URL's. Don't set it to an empty string, adjust FRONTEND_ROUTES instead.
 URL_DATE_FORMAT = '%Y/%m/%d'
 
@@ -55,10 +58,22 @@ POST_DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 
 # Routes to the view functions in the frontend
 FRONTEND_ROUTES = {
+    'static_files': 'static/<path:filename>',
     'index': '',
     'show_post': '<path:post_date>/<slug>.html',
     'show_rss': 'feed/rss/',
     'show_atom': 'feed/atom/',
     'postlist_by_tag': 'tag/<tag>/',
+    }
+
+# Routes to the view functions in the admin
+ADMIN_ROUTES = {
     'static_files': 'static/<path:filename>',
+    'index': '',
+    'login': 'login/',
+    'logout': 'logout/',
+    'new_post': 'edit/',
+    'edit_post': 'edit/<int:post_id>/',
+    'save_new_post': 'save/',
+    'save_post': 'save/<int:post_id>/',
     }
