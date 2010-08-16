@@ -33,8 +33,8 @@ content, and every action requires a logged-in user.
 """
 
 from __future__ import with_statement
-from flask import Flask, request, session, abort, \
-     redirect, url_for, render_template, flash
+from flask import Flask, g, request, session, abort, redirect, url_for, \
+     render_template, send_from_directory, flash
 from functools import wraps
 from database import DB
 from models import User, Tag, Format, Status, Post
@@ -42,6 +42,7 @@ from datetime import datetime
 from sqlalchemy.sql import and_
 from helpers import encrypt, slugify
 
+import os
 import re
 import config as cfg
 
@@ -49,7 +50,7 @@ import config as cfg
 # INITIALIZATION
 
 db_session = DB(cfg.ADMIN_DATABASE).get_session()
-app = Flask(__name__)
+app = Flask(__name__, static_path=None)
 app.config.from_object(cfg)
 
 #---------------------------------------------------------------------------
@@ -95,12 +96,24 @@ def get_post(post_id):
 
     return post
 
+def get_route(function):
+    """Return complete route based on configuration and routes"""
+    return '/%s%s' % (cfg.ADMIN_PREFIX, cfg.ADMIN_ROUTES[function])
+
 #---------------------------------------------------------------------------
 # VIEWS
 
-@app.route('/login/', methods=['POST'])
+@app.route(get_route('static_files'))
+def static(filename):
+    """Send static files such as style sheets, JavaScript, etc."""
+    static_path = os.path.join(app.root_path, 'templates', 'admin', 'static')
+    app.logger.debug(static_path)
+    return send_from_directory(static_path, filename)
+
+@app.route(get_route('login'), methods=['POST'])
 def login():
     """Check user credentials and initialize session"""
+    g.cfg = cfg
     error = None
     if request.method == 'POST':
         hashedpassword = encrypt(request.form['password'])
@@ -118,7 +131,7 @@ def login():
         error = 'Unknown user'
     return render_template(os.path.join('admin', 'login.html'), error=error)
 
-@app.route('/logout/')
+@app.route(get_route('logout'))
 @login_required
 def logout():
     """Clear the session"""
@@ -126,19 +139,21 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('index'))
 
-@app.route('/')
+@app.route(get_route('index'))
 @login_required
 def index():
     """The front page of this application"""
+    g.cfg = cfg
     posts = db_session.query(Post).filter(
         Post.user_id==session['user_id'])
     return render_template(os.path.join('admin', 'index.html'), posts=posts)
 
-@app.route('/edit/')
-@app.route('/edit/<int:post_id>/')
+@app.route(get_route('new_post'))
+@app.route(get_route('edit_post'))
 @login_required
 def edit_post(post_id=None):
     """Render form to edit a Post"""
+    g.cfg = cfg
     formats = db_session.query(Format).all()
     statuses = db_session.query(Status).all()
     post = None
@@ -151,11 +166,12 @@ def edit_post(post_id=None):
                            formats=formats,
                            statuses=statuses)
 
-@app.route('/save/', methods=['POST'])
-@app.route('/save/<int:post_id>/', methods=['POST'])
+@app.route(get_route('save_new_post'), methods=['POST'])
+@app.route(get_route('save_post'), methods=['POST'])
 @login_required
 def save_post(post_id=None):
     """Save changed Post content to database or save new Post"""
+    g.cfg = cfg
     message = 'Post updated'
 
     if post_id is None:
