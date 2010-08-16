@@ -1,0 +1,97 @@
+Imposter - Another weblog app
+=============================
+
+Copyright and license
+---------------------
+
+Copyright (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   1. Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Imposter features and lack thereof
+----------------------------------
+
+* Imposter consists of small but functional separated admin and
+  frontend applications. In the future a separate api and frontend
+  user interaction app is planned. See also note1_.
+
+* Posts can be edited in ReST, Markdown or HTML code. This is a
+  per-post option.
+
+* Tag support
+
+* Theme support (Jinja2 is used for templates)
+
+* Supports various databases (everything SQLAlchemy supports)
+
+* Simple to read, understand and hack code (and there's not a whole
+  lot of it)
+
+* Since the frontend app does not write to the data sources, there is
+  NO support for comments. The current plan is to develop a separate
+  app for frontend user interaction that will deal with this.
+
+  I currently recommend using a service like Disqus.com
+
+
+.. _note1:
+
+Ideas behind the separation of apps
+
+* You can easily run the admin on HTTPS while the front-end runs on
+  HTTP
+
+* You can easily run the admin on a private LAN while the front-end
+  runs on public servers
+
+* The frontend doesn't need write rights
+
+* Performance: front-end can be optimized for viewing content, admin
+  for changing content
+
+* Run multiple front-ends to distribute load
+
+* Stability: problems with the admin should not cause problems in the
+  front-end and vice-versa
+
+
+Installation
+------------
+
+Requirements
+~~~~~~~~~~~~
+
+* Python (developed with 2.5)
+* A database supported by SQLAlchemy
+* Flask
+* Werkzeug 
+* SQLAlchemy
+* SQLAlchemy-migrate
+* docutils
+* Markdown
+
+Installation Instructions
+~~~~~~~~~~~~~~~~~~~~~~~~~
+TODO (there's no script to create the initial database yet)
