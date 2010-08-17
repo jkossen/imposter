@@ -101,13 +101,20 @@ def get_route(function):
     return '/%s%s' % (cfg.ADMIN_PREFIX, cfg.ADMIN_ROUTES[function])
 
 #---------------------------------------------------------------------------
+# TEMPLATE FILTERS
+
+@app.template_filter('datetimeformat')
+def datetimeformat(value, format='%a, %d %b %Y %H:%M:%S %Z'):
+    """Template filter for human-readable date formats"""
+    return value.strftime(format)
+
+#---------------------------------------------------------------------------
 # VIEWS
 
 @app.route(get_route('static_files'))
 def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
     static_path = os.path.join(app.root_path, 'templates', 'admin', 'static')
-    app.logger.debug(static_path)
     return send_from_directory(static_path, filename)
 
 @app.route(get_route('login'), methods=['POST'])
@@ -186,10 +193,13 @@ def save_post(post_id=None):
     post.content = request.form['text']
     post.lastmoddate = datetime.now()
     post.format = get_format(request.form['format'])
+    post.pubdate = datetime.strptime(request.form['pubdate'].strip(), '%Y-%m-%d %H:%M')
 
-    # update pubdate
+    # update pubdate if post's pubdate is None and its status is set
+    # to public
     if request.form['status'] == 'public' and \
-           unicode(post.status) != 'public':
+           unicode(post.status) != 'public' and \
+           post.pubdate is None:
         post.pubdate = datetime.now()
 
     post.status = get_status(request.form['status'])
