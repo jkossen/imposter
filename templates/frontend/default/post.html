@@ -1,0 +1,13 @@
+{% extends "frontend/default/layout.html" %}
+{% block body %}
+<h1>{{ post.title }}</h1>
+tags: 
+{% for tag in post.tags %}
+<a href="{{ url_for('show_postlist_by_tag', tag=tag.value) }}">{{ tag.value }}</a> 
+{% endfor %}
+
+<p>
+    {{ post.content|to_html(post.format)|safe }}
+</p>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"  />
+        <title>{% block title %}{{ g.cfg.TITLE }}{% endblock %}</title>
+        <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ g.cfg.FRONTEND_BASEURL }}{{ url_for('show_rss') }}" />
+    </head>
+    <body>
+        <div class="page">
+            <h1><a href="{{ url_for('show_index') }}">{{ g.cfg.TITLE }}</a></h1>
+            {% for message in get_flashed_messages() %}
+            <div class=flash>{{ message }}</div>
+            {% endfor %}
+            {% block body %}{% endblock %}
+        </div>
+    </body>
+</html>

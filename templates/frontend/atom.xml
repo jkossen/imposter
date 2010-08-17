@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>{{ g.cfg.TITLE }}</title>
+    {% for post in posts %}
+    <entry>
+        <title>{{ post[0].title }}</title>
+        <author>{{ post[2].username }}</author>
+        <link href="{{ url_for('show_post', post_id=post[0].id, _external=True) }}"/>
+        <content type="html">
+        {% if g.cfg.SUMMARIES %}
+        {{ post[0].content|summarize|to_html(post[0].format)|safe }}
+        {% else %}
+        {{ post[0].content|to_html(post[0].format)|safe }}
+        {% endif %}
+        </content>
+    </entry>
+    {% endfor %}
+</feed>

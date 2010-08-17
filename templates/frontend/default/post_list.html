@@ -1,0 +1,17 @@
+{% extends "frontend/default/layout.html" %}
+{% block body %}
+  <ul class=posts>
+  {% for post in posts %}
+    <li><h2>{{ post[0].pubdate|datetimeformat(g.cfg.POST_DATETIME_FORMAT) }} <a href="{{ url_for('show_post', slug=post[0].slug, post_date=post[0].pubdate|datetimeformat(g.cfg.URL_DATE_FORMAT)) }}">{{ post[0].title }}</a></h2>
+        <p>
+        {% if g.cfg.SUMMARIES %}
+        {{ post[0].content|summarize|to_html(post[0].format)|safe }}
+        {% else %}
+        {{ post[0].content|to_html(post[0].format)|safe }}
+        {% endif %}
+        </p>
+  {% else %}
+    <li><em>Unbelievable.  No posts here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
