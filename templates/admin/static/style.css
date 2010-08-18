@@ -1,10 +1,12 @@
 body            { background: #404040; }
 body, table     { font-family: sans-serif; font-size: 12px; }
+table           { border-spacing: 0; }
 a, h1, h2       { color: #377BA8; }
 h1, h2          { font-family: 'Georgia', serif; margin: 0; }
 h1              { border-bottom: 2px solid #eee; }
 h2              { font-size: 1.2em; }
 th              { text-align: left; }
+td              { vertical-align: top; }
 
 .page           { margin: 2em auto; border: 5px solid #ccc;
                   padding: 0.8em; background: white; }
@@ -18,3 +20,5 @@ th              { text-align: left; }
 .flash          { background: #CEE5F5; padding: 0.5em;
                   border: 1px solid #AACBE2; }
 .error          { background: #F0D6D6; padding: 0.5em; }
+
+.odd            { background: #dcf3ff; }
