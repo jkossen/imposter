@@ -41,6 +41,12 @@ FRONTEND_PORT = 5000
 # Port on which backend runs
 ADMIN_PORT = 5001
 
+# If you use FastCGI, this specifies the path to the socket for the frontend
+FRONTEND_FCGI_SOCKET = '/var/lib/imposter/frontend.sock'
+
+# If you use FastCGI, this specifies the path to the socket for the admin
+ADMIN_FCGI_SOCKET = '/var/lib/imposter/admin.sock'
+
 # Secret string used for secure hashing, you could use os.urandom(20)
 SECRET_KEY = 'CHANGE_THIS'
 
