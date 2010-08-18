@@ -35,7 +35,8 @@ Imposter features and lack thereof
 
 * Imposter consists of small but functional separated admin and
   frontend applications. In the future a separate api and frontend
-  user interaction app is planned. See also note1_.
+  user interaction app is planned. See also `Ideas behind the
+  separation of apps`_
 
 * Posts can be edited in ReST, Markdown or HTML code. This is a
   per-post option.
@@ -56,9 +57,8 @@ Imposter features and lack thereof
   I currently recommend using a service like Disqus.com
 
 
-.. _note1:
-
 Ideas behind the separation of apps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * You can easily run the admin on HTTPS while the front-end runs on
   HTTP
@@ -82,9 +82,9 @@ Installation
 
 Requirements
 ~~~~~~~~~~~~
+Imposter requires the following software:
 
 * Python (developed with 2.5)
-* A database supported by SQLAlchemy
 * Flask
 * Werkzeug 
 * SQLAlchemy
@@ -92,6 +92,26 @@ Requirements
 * docutils
 * Markdown
 
+As Imposter uses SQLAlchemy for its database abstraction layer, make
+sure you have a database supported by SQLAlchemy available.
+
 Installation Instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-TODO (there's no script to create the initial database yet)
+* Install the software listed under `Requirements`_
+* Adjust the configuration in config.py
+* Create a database and database accounts for Imposter
+* Install the Imposter database: python dbmanage.py install
+
+There are several options for running Imposter. To run with the
+standard Werkzeug webserver, you can just run python frontend.py for
+the frontend, and python admin.py for the admin. Because this is often
+not an option for production environments, you can also run Imposter
+under Apache using mod_wsgi, or using FastCGI under any other
+webserver.
+
+For mod_wsgi, Imposter comes with frontend.wsgi and admin.wsgi files.
+
+For FastCGI, Imposter comes with frontend.fcgi and admin.fcgi files.
+
+Check http://flask.pocoo.org/docs/deploying/ for more information
+concerning deployment.
