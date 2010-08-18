@@ -87,8 +87,8 @@ def shutdown_session(response):
 #---------------------------------------------------------------------------
 # TEMPLATE FILTERS
 
-@app.template_filter('datetimeformat')
-def datetimeformat(value, format='%a, %d %b %Y %H:%M:%S %Z'):
+@app.template_filter('strftime')
+def strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
     """Template filter for human-readable date formats"""
     return value.strftime(format)
 
