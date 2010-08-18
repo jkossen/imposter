@@ -69,6 +69,9 @@ class User(Base):
         self.username = username
         self.password = password
 
+    def __unicode__(self):
+        return self.username
+
     def __repr__(self):
         return '<User %r>' % self.username
 
