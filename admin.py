@@ -40,7 +40,7 @@ from database import DB
 from models import User, Tag, Format, Status, Post
 from datetime import datetime
 from sqlalchemy.sql import and_
-from helpers import encrypt, slugify
+from helpers import hashify, slugify
 
 import os
 import re
@@ -123,7 +123,7 @@ def login():
     g.cfg = cfg
     error = None
     if request.method == 'POST':
-        hashedpassword = encrypt(request.form['password'])
+        hashedpassword = hashify(request.form['password'])
         userquery = User.query.filter(and_(
             User.username=='%s' % request.form['username'],
             User.password=='%s' % hashedpassword))

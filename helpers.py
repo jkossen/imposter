@@ -41,7 +41,7 @@ def tn(tablename):
     """ shortcut to get tablename with prefix """
     return '%s%s' % (cfg.TABLEPREFIX, tablename)
 
-def encrypt(text):
+def hashify(text):
     return sha256('%s%s' % (cfg.SECRET_KEY, text)).hexdigest()
 
 class HTMLFragmentTranslator(HTMLTranslator):
