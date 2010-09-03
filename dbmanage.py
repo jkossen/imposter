@@ -31,6 +31,7 @@ installing a new Imposter database and upgrading it to newer versions.
 
 """
 
+from flask import Flask
 from migrate.versioning.api import version_control, upgrade
 from models import User, Tag, Status, Format, Post
 from database import DB
@@ -40,26 +41,29 @@ from datetime import datetime
 import sys
 import getpass
 
-import config
+app = Flask(__name__, static_path=None)
+app.config.from_pyfile('config.py')
+app.config.from_envvar('IMPOSTER_DBMANAGE_CONFIG', silent=True)
 
 def vc_db():
     """install SQLAlchemy-migrate versioning tables into database"""
-    version_control(url=config.ADMIN_DATABASE, repository='migrations/')
+    version_control(url=app.config['ADMIN_DATABASE'], repository='migrations/')
 
 def upgrade_db():
     """upgrade database schema to latest version"""
-    upgrade(url=config.ADMIN_DATABASE, repository='migrations/')
+    upgrade(url=app.config['ADMIN_DATABASE'], repository='migrations/')
 
 def add_initial_data():
+    """Insert initial data into the database"""
     # open database session
-    db_session = DB(config.ADMIN_DATABASE).get_session()
+    db_session = DB(app.config['ADMIN_DATABASE']).get_session()
 
     # ask user for an admin username and password
     username = raw_input('Please enter the admin username: ')
     password = getpass.getpass(prompt='Please enter the admin password: ')
 
     # add user to database
-    u = User(username, hashify(config.SECRET_KEY, password))
+    u = User(username, hashify(app.config['SECRET_KEY'], password))
     db_session.add(u)
 
     # create statuses
@@ -101,7 +105,7 @@ This is just a sample post to show Imposter works.
     db_session.commit()
 
 def install_db():
-    """shorthand which calls all functions necessary to install a new Imposter database"""
+    """Initialize new Imposter database"""
     vc_db()
     upgrade_db()
     add_initial_data()
