@@ -54,6 +54,9 @@ FRONTEND_FCGI_SOCKET = '/var/lib/imposter/frontend.sock'
 # If you use FastCGI, this specifies the path to the socket for the admin
 ADMIN_FCGI_SOCKET = '/var/lib/imposter/admin.sock'
 
+# If you use FastCGI, this specifies the path to the socket for the public_api
+PUBLIC_API_FCGI_SOCKET = '/var/lib/imposter/admin.sock'
+
 # Secret string used for secure hashing, you could use os.urandom(20)
 SECRET_KEY = 'CHANGE_THIS'
 
