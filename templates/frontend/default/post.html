@@ -1,7 +1,7 @@
 {% extends "frontend/default/layout.html" %}
 {% block body %}
 <h1>{{ post.title }}</h1>
-Posted on {{ post.pubdate|strftime(g.cfg.POST_DATETIME_FORMAT) }} by {{ post.user }}
+Posted on {{ post.pubdate|strftime(config.POST_DATETIME_FORMAT) }} by {{ post.user }}
 tags: 
 {% for tag in post.tags %}
 <a href="{{ url_for('show_postlist_by_tag', tag=tag.value) }}">{{ tag.value }}</a> 

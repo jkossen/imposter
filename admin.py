@@ -49,9 +49,9 @@ import config as cfg
 #---------------------------------------------------------------------------
 # INITIALIZATION
 
-db_session = DB(cfg.ADMIN_DATABASE).get_session()
 app = Flask(__name__, static_path=None)
 app.config.from_object(cfg)
+db_session = DB(app.config['ADMIN_DATABASE']).get_session()
 
 #---------------------------------------------------------------------------
 # SHORTCUT FUNCTIONS
@@ -90,7 +90,7 @@ def get_status(value):
 def get_post(post_id):
     """ Retrieve Post object based on given Post id"""
     post = Post.query.filter(and_(Post.user_id==session['user_id'],
-                                  Post.id=='%d' % post_id)).first()
+                                  Post.id==post_id)).first()
     if post is None:
         abort(404)
 
@@ -98,7 +98,7 @@ def get_post(post_id):
 
 def get_route(function):
     """Return complete route based on configuration and routes"""
-    return '/%s%s' % (cfg.ADMIN_PREFIX, cfg.ADMIN_ROUTES[function])
+    return '/%s%s' % (app.config['ADMIN_PREFIX'], app.config['ADMIN_ROUTES'][function])
 
 #---------------------------------------------------------------------------
 # TEMPLATE FILTERS
@@ -120,13 +120,12 @@ def static(filename):
 @app.route(get_route('login'), methods=['POST'])
 def login():
     """Check user credentials and initialize session"""
-    g.cfg = cfg
     error = None
     if request.method == 'POST':
         hashedpassword = hashify(request.form['password'])
         userquery = User.query.filter(and_(
-            User.username=='%s' % request.form['username'],
-            User.password=='%s' % hashedpassword))
+            User.username==request.form['username'],
+            User.password==hashedpassword))
 
         if userquery.count() == 1:
             user = userquery.first()
@@ -150,7 +149,6 @@ def logout():
 @login_required
 def index():
     """The front page of this application"""
-    g.cfg = cfg
     posts = db_session.query(Post).filter(
         Post.user_id==session['user_id'])
     return render_template(os.path.join('admin', 'index.html'), posts=posts)
@@ -160,7 +158,6 @@ def index():
 @login_required
 def edit_post(post_id=None):
     """Render form to edit a Post"""
-    g.cfg = cfg
     formats = db_session.query(Format).all()
     statuses = db_session.query(Status).all()
     post = None
@@ -178,7 +175,6 @@ def edit_post(post_id=None):
 @login_required
 def save_post(post_id=None):
     """Save changed Post content to database or save new Post"""
-    g.cfg = cfg
     message = 'Post updated'
 
     if post_id is None:
@@ -223,4 +219,4 @@ def save_post(post_id=None):
 #---------------------------------------------------------------------------
 # MAIN RUN LOOP
 if __name__ == '__main__':
-    app.run(host=cfg.ADMIN_HOST, port=cfg.ADMIN_PORT)
+    app.run(host=app.config['ADMIN_HOST'], port=app.config['ADMIN_PORT'])

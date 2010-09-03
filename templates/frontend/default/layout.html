@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"  />
-        <title>{% block title %}{{ g.cfg.TITLE }}{% endblock %}</title>
+        <title>{% block title %}{{ config.TITLE }}{% endblock %}</title>
         <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}" />
-        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ g.cfg.FRONTEND_BASEURL }}{{ url_for('show_rss') }}" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ config.FRONTEND_BASEURL }}{{ url_for('show_rss') }}" />
     </head>
     <body>
         <div class="page">
-            <h1><a href="{{ url_for('show_index') }}">{{ g.cfg.TITLE }}</a></h1>
+            <h1><a href="{{ url_for('show_index') }}">{{ config.TITLE }}</a></h1>
             {% for message in get_flashed_messages() %}
             <div class=flash>{{ message }}</div>
             {% endfor %}

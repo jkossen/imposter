@@ -9,10 +9,10 @@
      >
 
 <channel>
-    <title>{{ g.cfg.TITLE }}</title>
+    <title>{{ config.TITLE }}</title>
     <atom:link href="{{ url_for('show_rss', _external=True) }}" rel="self" type="application/rss+xml" />
     <link>{{ url_for('show_index', _external=True)}}</link>
-    <description>{{ g.cfg.DESCRIPTION }}</description>
+    <description>{{ config.DESCRIPTION }}</description>
     <lastBuildDate>{{ posts[0][0].pubdate|datetimeformat }}</lastBuildDate>
 
     <language>en</language>
@@ -31,7 +31,7 @@
 
         <guid isPermaLink="false">{{ url_for('show_post', post_id=post[0].id, _external=True) }}</guid>
         <description><![CDATA[
-        {% if g.cfg.SUMMARIES %}
+        {% if config.SUMMARIES %}
         {{ post[0].content|summarize|to_html(post[0].format)|safe }}
         {% else %}
         {{ post[0].content|to_html(post[0].format)|safe }}

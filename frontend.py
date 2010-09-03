@@ -41,16 +41,15 @@ from database import DB
 
 import os
 
-import config as cfg
 import helpers
 
 #---------------------------------------------------------------------------
 # INITIALIZATION
 
 app = Flask(__name__, static_path=None)
-app.config.from_object(cfg)
+app.config.from_object('config.py')
 
-db_session = DB(cfg.FRONTEND_DATABASE).get_session()
+db_session = DB(app.config['FRONTEND_DATABASE']).get_session()
 
 # filter to make sure we only get posts which have status 'public'
 filter_public = and_(Post.status_id==Status.id,
@@ -67,15 +66,14 @@ posts_base = db_session.query(Post, Status, User).filter(filter_public)
 
 def get_route(function):
     """Return complete route based on configuration and routes"""
-    return '/%s%s' % (cfg.FRONTEND_PREFIX, cfg.FRONTEND_ROUTES[function])
+    return '/%s%s' % (app.config['FRONTEND_PREFIX'], app.config['FRONTEND_ROUTES'][function])
 
 def themed(template):
     """Return path to template in configured theme"""
-    return os.path.join('frontend', cfg.THEME, template)
+    return os.path.join('frontend', app.config['THEME'], template)
 
 def post_list(posts):
     """Render a list of posts"""
-    g.cfg = cfg
     return render_template(themed('post_list.html'), posts=posts)
 
 @app.after_request
@@ -109,20 +107,18 @@ def to_html(content, format):
 def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
     static_path = os.path.join(app.root_path, 'templates', 'frontend',
-                               cfg.THEME, 'static')
+                               app.config['THEME'], 'static')
     return send_from_directory(static_path, filename)
 
 @app.route(get_route('index'))
 def show_index():
     """Render the frontpage"""
-    g.cfg = cfg
     posts = posts_base.order_by(Post.pubdate.desc())
     return post_list(posts)
 
 @app.route(get_route('show_post'))
 def show_post(slug, **kwargs):
     """Render a Post"""
-    g.cfg = cfg
     post = posts_base.filter(Post.slug==slug).first()
     return render_template(themed('post.html'), post=post[0])
 
@@ -143,18 +139,16 @@ def show_postlist_by_tag(tag):
 @app.route(get_route('show_atom'))
 def show_atom():
     """Render atom feed of posts"""
-    g.cfg = cfg
-    posts = posts_base.order_by(Post.pubdate.desc())[:cfg.FEEDITEMS]
+    posts = posts_base.order_by(Post.pubdate.desc())[:app.config['FEEDITEMS']]
     return render_template(os.path.join('frontend', 'atom.xml'), posts=posts)
 
 @app.route(get_route('show_rss'))
 def show_rss():
     """Render RSS feed of posts"""
-    g.cfg = cfg
-    posts = posts_base.order_by(Post.pubdate.desc())[:cfg.FEEDITEMS]
+    posts = posts_base.order_by(Post.pubdate.desc())[:app.config['FEEDITEMS']]
     return render_template(os.path.join('frontend', 'rss.xml'), posts=posts)
 
 #---------------------------------------------------------------------------
 # MAIN RUN LOOP
 if __name__ == '__main__':
-    app.run(host=cfg.FRONTEND_HOST, port=cfg.FRONTEND_PORT)
+    app.run(host=app.config['FRONTEND_HOST'], port=app.config['FRONTEND_PORT'])

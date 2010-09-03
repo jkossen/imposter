@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"  />
-        <title>{{ g.cfg.TITLE }} Admin</title>
+        <title>{{ config.TITLE }} Admin</title>
         <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
         <div class="page">
-            <h1><a href="/">{{ g.cfg.TITLE }} Admin</a></h1>
+            <h1><a href="/">{{ config.TITLE }} Admin</a></h1>
 
             {% if session.user_id %}
             <div class=metanav>

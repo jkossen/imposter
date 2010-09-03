@@ -33,15 +33,17 @@ public data from the database.
 """
 
 from flask import Flask, g, render_template, send_from_directory, abort, jsonify
+from flask.config import ConfigAttribute
 from datetime import datetime
 from models import User, Tag, Status, Format, Post
 from sqlalchemy.sql import and_
 
 from database import DB
 
+import config as cfg
+
 import os
 
-import config as cfg
 import helpers
 
 #---------------------------------------------------------------------------
@@ -49,8 +51,8 @@ import helpers
 
 app = Flask(__name__, static_path=None)
 app.config.from_object(cfg)
-
-db_session = DB(cfg.PUBLIC_API_DATABASE).get_session()
+app.config.from_envvar('IMPOSTER_PUBLIC_API_SETTINGS')
+db_session = DB(app.config['PUBLIC_API_DATABASE']).get_session()
 
 # filter to make sure we only get posts which have status 'public'
 filter_public = and_(Post.status_id==Status.id,
@@ -67,7 +69,7 @@ posts_base = db_session.query(Post, Status, User).filter(filter_public)
 
 def get_route(function):
     """Return complete route based on configuration and routes"""
-    return '/%s%s' % (cfg.PUBLIC_API_PREFIX, cfg.PUBLIC_API_ROUTES[function])
+    return '/%s%s' % (app.config['PUBLIC_API_PREFIX'], app.config['PUBLIC_API_ROUTES'][function])
 
 def get_public_post_dict(post, user):
     """Return a dict containing public post data"""
