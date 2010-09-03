@@ -67,7 +67,8 @@ Ideas behind the separation of apps
 * You can easily run the admin on a private LAN while the front-end
   runs on public servers
 
-* The frontend doesn't need write rights
+* The frontend and public_api app don't need write permissions since
+  they don't manipulate data
 
 * Performance: front-end can be optimized for viewing content, admin
   for changing content
