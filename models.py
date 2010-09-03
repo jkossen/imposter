@@ -1,6 +1,6 @@
 from sqlalchemy import Table, Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import mapper, relation, relationship, backref
-from database import DB
+from database import DB, ImposterBase
 from helpers import tn
 from time import strftime
 
@@ -14,11 +14,13 @@ post_tags = Table(tn('post_tags'), Base.metadata,
              Column('tag_id', Integer, ForeignKey('%s.id' % tn('tags')))
              )
 
-class Status(Base):
+class Status(Base,ImposterBase):
     __tablename__ = tn('status')
 
     id = Column(Integer, primary_key=True)
     value = Column(String(32), unique=True)
+
+    __public_columns__ = [ value ]
 
     def __init__(self, value):
         self.value = value
@@ -29,10 +31,12 @@ class Status(Base):
     def __repr__(self):
         return '<Status %r>' % self.value
 
-class Format(Base):
+class Format(Base,ImposterBase):
     __tablename__ = tn('formats')
     id = Column(Integer, primary_key=True)
     value = Column(String(32), nullable=False, unique=True)
+
+    __public_columns__ = [ value ]
 
     def __init__(self, value):
         self.value = value
@@ -43,11 +47,13 @@ class Format(Base):
     def __repr__(self):
         return '<Format %r>' % self.value
 
-class Tag(Base):
+class Tag(Base,ImposterBase):
     __tablename__ = tn('tags')
 
     id = Column(Integer, primary_key=True)
     value = Column(String(64), nullable=False, unique=True)
+
+    __public_columns__ = [ value ]
 
     def __init__(self, value):
         self.value = value
@@ -58,12 +64,14 @@ class Tag(Base):
     def __repr__(self):
         return '<Tag %r>' % self.value
 
-class User(Base):
+class User(Base,ImposterBase):
     __tablename__ = tn('users')
 
     id = Column(Integer, primary_key=True)
     username = Column(String(64), nullable=False, unique=True)
     password = Column(String(256), nullable=False)
+
+    __public_columns__ = [ username ]
 
     def __init__(self, username, password):
         self.username = username
@@ -75,7 +83,7 @@ class User(Base):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class Post(Base):
+class Post(Base,ImposterBase):
     __tablename__ = tn('posts')
 
     id = Column(Integer, primary_key=True)
@@ -95,6 +103,8 @@ class Post(Base):
     tags = relationship('Tag', secondary=post_tags, backref='posts')
     format = relationship(Format, backref='posts')
 
+    __public_columns__ = [ title, slug, content, pubdate, lastmoddate ]
+
     def __init__(self, title=None, content=None, createdate=None, pubdate=None, lastmoddate=None):
         self.title = title
         self.content = content
@@ -104,3 +114,4 @@ class Post(Base):
 
     def __repr__(self):
         return '<Post %s>' % self.title
+
