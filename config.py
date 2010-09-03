@@ -12,6 +12,7 @@ FRONTEND_BASEURL='http://CHANGE_THIS.ORG/imposter'
 
 # Database connection strings, example: postgres://imposter:mysecretpassword@localhost:5432/imposter
 FRONTEND_DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
+PUBLIC_API_DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
 ADMIN_DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
 
 # Theme
@@ -32,14 +33,20 @@ TABLEPREFIX = 'imposter_'
 # Host on which frontend runs
 FRONTEND_HOST = '192.168.1.3'
 
+# Host on which public_api runs
+PUBLIC_API_HOST = '192.168.1.3'
+
 # Host on which admin runs
 ADMIN_HOST = '192.168.1.3'
 
 # Port on which frontend runs
 FRONTEND_PORT = 5000
 
+# Port on which public_api runs
+PUBLIC_API_PORT = 5001
+
 # Port on which backend runs
-ADMIN_PORT = 5001
+ADMIN_PORT = 5002
 
 # If you use FastCGI, this specifies the path to the socket for the frontend
 FRONTEND_FCGI_SOCKET = '/var/lib/imposter/frontend.sock'
@@ -51,10 +58,13 @@ ADMIN_FCGI_SOCKET = '/var/lib/imposter/admin.sock'
 SECRET_KEY = 'CHANGE_THIS'
 
 # Frontend prefix, ie the 'posts/' in http://yourweblog.net/posts/
-FRONTEND_PREFIX=''
+FRONTEND_PREFIX='imposter/'
 
 # Admin prefix, ie the 'admin/' in http://yourweblog.net/admin/
 ADMIN_PREFIX=''
+
+# public_api prefix, ie the 'api/' in http://yourweblog.net/api/
+PUBLIC_API_PREFIX='api/'
 
 # Date format to use in URL's. Don't set it to an empty string, adjust FRONTEND_ROUTES instead.
 URL_DATE_FORMAT = '%Y/%m/%d'
@@ -70,6 +80,19 @@ FRONTEND_ROUTES = {
     'show_rss': 'feed/rss/',
     'show_atom': 'feed/atom/',
     'postlist_by_tag': 'tag/<tag>/',
+    }
+
+# Routes to the view functions in the frontend
+PUBLIC_API_ROUTES = {
+    'json_status_by_id': 'json/status/<id>/',
+    'json_format_by_id': 'json/format/<id>/',
+    'json_user_by_id': 'json/user/<id>/',
+    'json_post_by_slug': 'json/post/<slug>/',
+    'json_sluglist_latest': 'json/latest/',
+    'json_posts_latest': 'json/posts/latest/',
+    'json_statuslist': 'json/statuses/',
+    'json_taglist': 'json/tags/',
+    'json_sluglist_by_tag': 'json/tag/<tag>/',
     }
 
 # Routes to the view functions in the admin
