@@ -29,20 +29,16 @@ utility function library
 
 """
 
+from flask import g
 from hashlib import sha256
 from docutils import core
 from docutils.writers.html4css1 import Writer,HTMLTranslator
-import config as cfg
 import markdown
 import re
 from unicodedata import normalize
 
-def tn(tablename):
-    """ shortcut to get tablename with prefix """
-    return '%s%s' % (cfg.TABLEPREFIX, tablename)
-
-def hashify(text):
-    return sha256('%s%s' % (cfg.SECRET_KEY, text)).hexdigest()
+def hashify(seed, text):
+    return sha256('%s%s' % (seed, text)).hexdigest()
 
 class HTMLFragmentTranslator(HTMLTranslator):
     def __init__(self, document):
@@ -84,12 +80,6 @@ def slugify(text, delim=u'-', maxlen=128):
         if word:
             result.append(word)
     return unicode(delim.join(result)[0:maxlen])
-
-def readable_date(date):
-    return strftime(cfg.URL_DATE_FORMAT, date.timetuple())
-
-def readable_datetime(date):
-    return strftime(cfg.POST_DATETIME_FORMAT, date.timetuple())
 
 def summarize(content, length=250, suffix='...'):
     """Generate summary from given content

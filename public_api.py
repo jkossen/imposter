@@ -40,8 +40,6 @@ from sqlalchemy.sql import and_
 
 from database import DB
 
-import config as cfg
-
 import os
 
 import helpers
@@ -50,8 +48,8 @@ import helpers
 # INITIALIZATION
 
 app = Flask(__name__, static_path=None)
-app.config.from_object(cfg)
-app.config.from_envvar('IMPOSTER_PUBLIC_API_SETTINGS')
+app.config.from_pyfile('config.py')
+app.config.from_envvar('IMPOSTER_PUBLIC_API_CONFIG', silent=True)
 db_session = DB(app.config['PUBLIC_API_DATABASE']).get_session()
 
 # filter to make sure we only get posts which have status 'public'
@@ -74,8 +72,8 @@ def get_route(function):
 def get_public_post_dict(post, user):
     """Return a dict containing public post data"""
     post_dict = post.get_public_dict()
-    post_dict['pubdate'] = post.pubdate.strftime(cfg.POST_DATETIME_FORMAT)
-    post_dict['lastmoddate'] = post.lastmoddate.strftime(cfg.POST_DATETIME_FORMAT)
+    post_dict['pubdate'] = post.pubdate.strftime(app.config['POST_DATETIME_FORMAT'])
+    post_dict['lastmoddate'] = post.lastmoddate.strftime(app.config['POST_DATETIME_FORMAT'])
     post_dict['username'] = user.username
 
     return post_dict
@@ -125,17 +123,17 @@ def json_user_by_id(id):
 @app.route(get_route('json_sluglist_latest'))
 def json_sluglist_latest():
     """List of post slugs (by post publication date) in the database"""
-    posts = posts_base.order_by(Post.pubdate.desc())[:cfg.FEEDITEMS]
+    posts = posts_base.order_by(Post.pubdate.desc())[:app.config['FEEDITEMS']]
     out = {'posts': []}
     for post in posts:
-        out['posts'].append([post[0].pubdate.strftime(cfg.POST_DATETIME_FORMAT), post[0].slug])
+        out['posts'].append([post[0].pubdate.strftime(app.config['POST_DATETIME_FORMAT']), post[0].slug])
 
     return jsonify(out)
 
 @app.route(get_route('json_posts_latest'))
 def json_posts_latest():
     """Latest posts (by publication date) in the database"""
-    posts = posts_base.order_by(Post.pubdate.desc())[:cfg.FEEDITEMS]
+    posts = posts_base.order_by(Post.pubdate.desc())[:app.config['FEEDITEMS']]
     out = {'posts': []}
     for post_result in posts:
         post_dict = get_public_post_dict(post_result[0], post_result[2])
@@ -179,4 +177,4 @@ def json_sluglist_by_tag(tag):
 #---------------------------------------------------------------------------
 # MAIN RUN LOOP
 if __name__ == '__main__':
-    app.run(host=cfg.PUBLIC_API_HOST, port=cfg.PUBLIC_API_PORT)
+    app.run(host=app.config['PUBLIC_API_HOST'], port=app.config['PUBLIC_API_PORT'])

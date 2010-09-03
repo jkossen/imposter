@@ -47,8 +47,8 @@ import helpers
 # INITIALIZATION
 
 app = Flask(__name__, static_path=None)
-app.config.from_object('config.py')
-
+app.config.from_pyfile('config.py')
+app.config.from_envvar('IMPOSTER_FRONTEND_CONFIG', silent=True)
 db_session = DB(app.config['FRONTEND_DATABASE']).get_session()
 
 # filter to make sure we only get posts which have status 'public'

@@ -59,7 +59,7 @@ def add_initial_data():
     password = getpass.getpass(prompt='Please enter the admin password: ')
 
     # add user to database
-    u = User(username, hashify(password))
+    u = User(username, hashify(cfg.SECRET_KEY, password))
     db_session.add(u)
 
     # create statuses

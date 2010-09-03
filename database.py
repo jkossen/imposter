@@ -1,25 +1,26 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, class_mapper
 from sqlalchemy.ext.declarative import declarative_base
-import config as cfg
+
+Base = declarative_base()
 
 class DB(object):
     engine = None
     db_session = None
-    Base = declarative_base()
+    tableprefix = ''
 
     def __init__(self, dbstring):
         self.engine = create_engine(dbstring, convert_unicode=True)
         self.db_session = scoped_session(sessionmaker(autocommit=False,
                                                  autoflush=False,
                                                  bind=self.engine))
-        self.Base.query = self.db_session.query_property()
+        Base.query = self.db_session.query_property()
 
     def get_session(self):
         return self.db_session
 
-    def get_base(self):
-        return self.Base
+    def get_tableprefix(self):
+        return self.tableprefix
 
 class ImposterBase(object):
     """ Mixin class to provide additional generic functions for the sqlalchemy models """

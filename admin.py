@@ -44,13 +44,13 @@ from helpers import hashify, slugify
 
 import os
 import re
-import config as cfg
 
 #---------------------------------------------------------------------------
 # INITIALIZATION
 
 app = Flask(__name__, static_path=None)
-app.config.from_object(cfg)
+app.config.from_pyfile('config.py')
+app.config.from_envvar('IMPOSTER_ADMIN_CONFIG', silent=True)
 db_session = DB(app.config['ADMIN_DATABASE']).get_session()
 
 #---------------------------------------------------------------------------
@@ -122,7 +122,7 @@ def login():
     """Check user credentials and initialize session"""
     error = None
     if request.method == 'POST':
-        hashedpassword = hashify(request.form['password'])
+        hashedpassword = hashify(app.config['SECRET_KEY'], request.form['password'])
         userquery = User.query.filter(and_(
             User.username==request.form['username'],
             User.password==hashedpassword))

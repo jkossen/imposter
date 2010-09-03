@@ -1,13 +1,12 @@
 from sqlalchemy import Table, Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import mapper, relation, relationship, backref
-from database import DB, ImposterBase
-from helpers import tn
+from database import Base, ImposterBase
 from time import strftime
+from config import TABLEPREFIX
 
-import config as cfg
-
-db = DB(cfg.FRONTEND_DATABASE)
-Base = db.get_base()
+def tn(tablename):
+    """ shortcut to get tablename with prefix """
+    return '%s%s' % (TABLEPREFIX, tablename)
 
 post_tags = Table(tn('post_tags'), Base.metadata,
              Column('post_id', Integer, ForeignKey('%s.id' % tn('posts'))),
