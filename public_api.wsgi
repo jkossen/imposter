@@ -1,0 +1,1 @@
+from public_api import app as application
