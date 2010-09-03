@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker, class_mapper
 from sqlalchemy.ext.declarative import declarative_base
 import config as cfg
 
@@ -20,3 +20,16 @@ class DB(object):
 
     def get_base(self):
         return self.Base
+
+class ImposterBase(object):
+    """ Mixin class to provide additional generic functions for the sqlalchemy models """
+
+    def to_dict(obj):
+        """Return dict containing all object data"""
+        return dict((col.name, unicode(getattr(obj, col.name)))
+                    for col in class_mapper(obj.__class__).mapped_table.c)
+
+    def get_public_dict(obj):
+        """Return dict containing only public object data"""
+        return dict((col.name, unicode(getattr(obj, col.name)))
+                    for col in obj.__class__.__public_columns__)
