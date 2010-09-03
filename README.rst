@@ -54,7 +54,8 @@ Imposter features and lack thereof
   NO support for comments. The current plan is to develop a separate
   app for frontend user interaction that will deal with this.
 
-  I currently recommend using a service like Disqus.com
+  I currently recommend using a service such as those provided by
+  http://disqus.com or http://intensedebate.com
 
 
 Ideas behind the separation of apps
@@ -84,12 +85,13 @@ Requirements
 ~~~~~~~~~~~~
 Imposter requires the following software:
 
-* Python (developed with 2.5)
+* Python (developed with 2.5 provided with Debian Lenny)
 * Flask
 * Werkzeug 
+* Jinja2
 * SQLAlchemy
-* SQLAlchemy-migrate
-* docutils
+* SQLAlchemy-migrate (database schema versioning)
+* docutils (provides ReST support)
 * Markdown
 
 As Imposter uses SQLAlchemy for its database abstraction layer, make
