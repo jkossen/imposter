@@ -33,7 +33,7 @@ content, and every action requires a logged-in user.
 """
 
 from __future__ import with_statement
-from flask import Flask, g, request, session, abort, redirect, url_for, \
+from flask import Flask, request, session, abort, redirect, url_for, \
      render_template, send_from_directory, flash
 from functools import wraps
 from database import DB
@@ -98,7 +98,8 @@ def get_post(post_id):
 
 def get_route(function):
     """Return complete route based on configuration and routes"""
-    return '/%s%s' % (app.config['ADMIN_PREFIX'], app.config['ADMIN_ROUTES'][function])
+    return '/%s%s' % (app.config['ADMIN_PREFIX'],
+                      app.config['ADMIN_ROUTES'][function])
 
 #---------------------------------------------------------------------------
 # TEMPLATE FILTERS
@@ -122,7 +123,8 @@ def login():
     """Check user credentials and initialize session"""
     error = None
     if request.method == 'POST':
-        hashedpassword = hashify(app.config['SECRET_KEY'], request.form['password'])
+        hashedpassword = hashify(app.config['SECRET_KEY'],
+                                 request.form['password'])
         userquery = User.query.filter(and_(
             User.username==request.form['username'],
             User.password==hashedpassword))
@@ -189,7 +191,8 @@ def save_post(post_id=None):
     post.content = request.form['text']
     post.lastmoddate = datetime.now()
     post.format = get_format(request.form['format'])
-    post.pubdate = datetime.strptime(request.form['pubdate'].strip(), '%Y-%m-%d %H:%M')
+    post.pubdate = datetime.strptime(request.form['pubdate'].strip(),
+                                     '%Y-%m-%d %H:%M')
 
     # update pubdate if post's pubdate is None and its status is set
     # to public
