@@ -40,26 +40,26 @@ from datetime import datetime
 import sys
 import getpass
 
-import config as cfg
+import config
 
 def vc_db():
     """install SQLAlchemy-migrate versioning tables into database"""
-    version_control(url=cfg.FRONTEND_DATABASE, repository='migrations/')
+    version_control(url=config.ADMIN_DATABASE, repository='migrations/')
 
 def upgrade_db():
     """upgrade database schema to latest version"""
-    upgrade(url=cfg.FRONTEND_DATABASE, repository='migrations/')
+    upgrade(url=config.ADMIN_DATABASE, repository='migrations/')
 
 def add_initial_data():
     # open database session
-    db_session = DB(cfg.FRONTEND_DATABASE).get_session()
+    db_session = DB(config.ADMIN_DATABASE).get_session()
 
     # ask user for an admin username and password
     username = raw_input('Please enter the admin username: ')
     password = getpass.getpass(prompt='Please enter the admin password: ')
 
     # add user to database
-    u = User(username, hashify(cfg.SECRET_KEY, password))
+    u = User(username, hashify(config.SECRET_KEY, password))
     db_session.add(u)
 
     # create statuses
