@@ -55,7 +55,7 @@ html_fragment_writer.translator_class = HTMLFragmentTranslator
 
 def rest_to_html(s):
     """Convert ReST input to HTML output"""
-    return core.publish_string(s, writer = html_fragment_writer)
+    return core.publish_string(s, writer=html_fragment_writer)
 
 def markup_to_html(format, text):
     """Convert supported marked-up input to HTML output"""
