@@ -8,37 +8,37 @@
      xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
      >
 
-<channel>
-    <title>{{ config.TITLE }}</title>
-    <atom:link href="{{ url_for('show_rss', _external=True) }}" rel="self" type="application/rss+xml" />
-    <link>{{ url_for('show_index', _external=True)}}</link>
-    <description>{{ config.DESCRIPTION }}</description>
-    <lastBuildDate>{{ posts[0][0].pubdate|datetimeformat }}</lastBuildDate>
+    <channel>
+        <title>{{ config.TITLE }}</title>
+        <atom:link href="{{ url_for('show_rss', _external=True) }}" rel="self" type="application/rss+xml" />
+        <link>{{ url_for('show_index', _external=True)}}</link>
+        <description>{{ config.DESCRIPTION }}</description>
+        <lastBuildDate>{{ posts[0][0].pubdate|strftime(config.POST_DATETIME_FORMAT)}}</lastBuildDate>
 
-    <language>en</language>
-    <sy:updatePeriod>hourly</sy:updatePeriod>
-    <sy:updateFrequency>1</sy:updateFrequency>
-    {% for post in posts %}
-    <item>
-        <title>{{ post[0].title }}</title>
+        <language>en</language>
+        <sy:updatePeriod>hourly</sy:updatePeriod>
+        <sy:updateFrequency>1</sy:updateFrequency>
+        {% for post in posts %}
+        <item>
+            <title>{{ post[0].title }}</title>
 
-        <link>{{ url_for('show_post', post_id=post[0].id, _external=True) }}</link>
-        <pubDate>{{ post[0].pubdate|datetimeformat }}</pubDate>
-        <dc:creator>{{ post[0].user.username }}</dc:creator>
-        {% for tag in post[0].tags %}
-        <category><![CDATA[{{ tag.value }}]]></category>
+            <link>{{ url_for('show_post', slug=post[0].slug, post_date=post[0].pubdate|strftime(config.URL_DATE_FORMAT), _external=True) }}</link>
+            <pubDate>{{ post[0].pubdate|strftime(config.POST_DATETIME_FORMAT) }}</pubDate>
+            <dc:creator>{{ post[0].user.username }}</dc:creator>
+            {% for tag in post[0].tags %}
+            <category><![CDATA[{{ tag.value }}]]></category>
+            {% endfor %}
+
+            <guid isPermaLink="false">{{ url_for('show_post', slug=post[0].slug, post_date=post[0].pubdate|strftime(config.URL_DATE_FORMAT), _external=True) }}</guid>
+            <description><![CDATA[
+            {% if config.SUMMARIES %}
+            {{ post[0].content|summarize|to_html(post[0].format)|safe }}
+            {% else %}
+            {{ post[0].content|to_html(post[0].format)|safe }}
+            {% endif %}
+            ]]>
+            </description>
+        </item>
         {% endfor %}
-
-        <guid isPermaLink="false">{{ url_for('show_post', post_id=post[0].id, _external=True) }}</guid>
-        <description><![CDATA[
-        {% if config.SUMMARIES %}
-        {{ post[0].content|summarize|to_html(post[0].format)|safe }}
-        {% else %}
-        {{ post[0].content|to_html(post[0].format)|safe }}
-        {% endif %}
-        ]]>
-        </description>
-    </item>
-    {% endfor %}
     </channel>
 </rss>
