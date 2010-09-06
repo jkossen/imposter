@@ -32,7 +32,7 @@ viewing content, not manipulation.
 
 """
 
-from flask import Flask, g, render_template, send_from_directory, abort
+from flask import Flask, render_template, send_from_directory, abort
 from datetime import datetime
 from models import User, Tag, Status, Post
 from sqlalchemy.sql import and_
@@ -66,7 +66,8 @@ posts_base = db_session.query(Post, Status, User).filter(filter_public)
 
 def get_route(function):
     """Return complete route based on configuration and routes"""
-    return '/%s%s' % (app.config['FRONTEND_PREFIX'], app.config['FRONTEND_ROUTES'][function])
+    return '/%s%s' % (app.config['FRONTEND_PREFIX'],
+                      app.config['FRONTEND_ROUTES'][function])
 
 def themed(template):
     """Return path to template in configured theme"""
