@@ -4,7 +4,8 @@ Imposter - Another weblog app
 Copyright and license
 ---------------------
 
-Copyright (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
+:copyright: (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
+:license: two-clause BSD
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
