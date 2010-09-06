@@ -7,7 +7,6 @@ Base = declarative_base()
 class DB(object):
     engine = None
     db_session = None
-    tableprefix = ''
 
     def __init__(self, dbstring):
         self.engine = create_engine(dbstring, convert_unicode=True)
@@ -18,9 +17,6 @@ class DB(object):
 
     def get_session(self):
         return self.db_session
-
-    def get_tableprefix(self):
-        return self.tableprefix
 
 class ImposterBase(object):
     """ Mixin class to provide additional generic functions for the sqlalchemy models """
