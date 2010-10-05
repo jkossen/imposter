@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+# LICENSE {{{
 """
 Imposter - Another weblog app
 Copyright (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
@@ -31,7 +33,9 @@ This is the admin application code for Imposter. It's used for editing
 content, and every action requires a logged-in user.
 
 """
+# }}}
 
+# IMPORTS {{{
 from __future__ import with_statement
 from flask import Flask, request, session, abort, redirect, url_for, \
      render_template, send_from_directory, flash
@@ -44,18 +48,16 @@ from helpers import hashify, slugify
 
 import os
 import re
+# }}}
 
-#---------------------------------------------------------------------------
-# INITIALIZATION
-
+# INITIALIZATION {{{
 app = Flask(__name__, static_path=None)
 app.config.from_pyfile('config.py')
 app.config.from_envvar('IMPOSTER_ADMIN_CONFIG', silent=True)
 db_session = DB(app.config['ADMIN_DATABASE']).get_session()
+# }}}
 
-#---------------------------------------------------------------------------
-# SHORTCUT FUNCTIONS
-
+# SHORTCUT FUNCTIONS {{{
 def login_required(fun):
     """Decorator for functions which require an authorized user"""
     @wraps(fun)
@@ -100,17 +102,16 @@ def get_route(function):
     """Return complete route based on configuration and routes"""
     return '/%s%s' % (app.config['ADMIN_PREFIX'],
                       app.config['ADMIN_ROUTES'][function])
+# }}}
 
-#---------------------------------------------------------------------------
-# TEMPLATE FILTERS
-
+# TEMPLATE FILTERS {{{
 @app.template_filter('strftime')
 def strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
     """Template filter for human-readable date formats"""
     return value.strftime(format)
+# }}}
 
-#---------------------------------------------------------------------------
-# VIEWS
+# VIEWS {{{
 
 @app.route(get_route('static_files'))
 def static(filename):
@@ -219,7 +220,9 @@ def save_post(post_id=None):
 
     return redirect(url_for('edit_post', post_id=post_id))
 
-#---------------------------------------------------------------------------
-# MAIN RUN LOOP
+# }}}
+
+# MAIN RUN LOOP {{{
 if __name__ == '__main__':
     app.run(host=app.config['ADMIN_HOST'], port=app.config['ADMIN_PORT'])
+# }}}
