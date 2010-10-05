@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# LICENSE {{{
 """
 Imposter - Another weblog app
 Copyright (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
@@ -31,7 +32,9 @@ This is the frontend application code for Imposter. It's only used for
 viewing content, not manipulation.
 
 """
+# }}}
 
+# IMPORTS {{{
 from flask import Flask, render_template, send_from_directory, abort
 from datetime import datetime
 from models import User, Tag, Status, Post
@@ -42,10 +45,9 @@ from database import DB
 import os
 
 import helpers
+# }}}
 
-#---------------------------------------------------------------------------
-# INITIALIZATION
-
+# INITIALIZATION {{{
 app = Flask(__name__, static_path=None)
 app.config.from_pyfile('config.py')
 app.config.from_envvar('IMPOSTER_FRONTEND_CONFIG', silent=True)
@@ -60,10 +62,9 @@ filter_public = and_(Post.status_id==Status.id,
 
 # base query used in all frontend retrieve queries
 posts_base = db_session.query(Post, Status, User).filter(filter_public)
+# }}}
 
-#---------------------------------------------------------------------------
-# SHORTCUT FUNCTIONS
-
+# SHORTCUT FUNCTIONS {{{
 def get_route(function):
     """Return complete route based on configuration and routes"""
     return '/%s%s' % (app.config['FRONTEND_PREFIX'],
@@ -82,10 +83,9 @@ def shutdown_session(response):
     """End session, close database"""
     db_session.remove()
     return response
+# }}}
 
-#---------------------------------------------------------------------------
-# TEMPLATE FILTERS
-
+# TEMPLATE FILTERS {{{
 @app.template_filter('strftime')
 def strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
     """Template filter for human-readable date formats"""
@@ -100,10 +100,9 @@ def summarize(content, length=250, suffix='...'):
 def to_html(content, format):
     """Convert input to html"""
     return helpers.markup_to_html(format, content)
+# }}}
 
-#---------------------------------------------------------------------------
-# FRONTEND VIEWS
-
+# FRONTEND VIEWS {{{
 @app.route(get_route('static_files'))
 def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
@@ -131,9 +130,9 @@ def show_postlist_by_tag(tag):
         abort(404)
     posts = posts_base.filter(Post.tags.contains(tagobj))
     return post_list(posts)
+# }}}
 
-#---------------------------------------------------------------------------
-# FEED VIEWS
+# FEED VIEWS {{{
 
 # TODO: Perhaps these should instead be part of the API app?
 
@@ -148,8 +147,9 @@ def show_rss():
     """Render RSS feed of posts"""
     posts = posts_base.order_by(Post.pubdate.desc())[:app.config['FEEDITEMS']]
     return render_template(os.path.join('frontend', 'rss.xml'), posts=posts)
+# }}}
 
-#---------------------------------------------------------------------------
-# MAIN RUN LOOP
+# MAIN RUN LOOP {{{
 if __name__ == '__main__':
     app.run(host=app.config['FRONTEND_HOST'], port=app.config['FRONTEND_PORT'])
+# }}}
