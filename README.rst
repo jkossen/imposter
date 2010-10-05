@@ -1,5 +1,10 @@
+=============================
 Imposter - Another weblog app
 =============================
+:Author: Jochem Kossen
+
+Imposter is a weblog application, written in Python_, utilizing Flask_,
+Werkzeug_, Jinja2_ and SQLAlchemy_.
 
 Copyright and license
 ---------------------
@@ -19,7 +24,7 @@ met:
       disclaimer in the documentation and/or other materials provided
       with the distribution.
 
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS
@@ -39,7 +44,7 @@ Imposter features and lack thereof
   user interaction app is planned. See also `Ideas behind the
   separation of apps`_
 
-* Posts can be edited in ReST, Markdown or HTML code. This is a
+* Posts can be edited in ReST_, Markdown_ or HTML code. This is a
   per-post option.
 
 * Tag support
@@ -57,7 +62,6 @@ Imposter features and lack thereof
 
   I currently recommend using a service such as those provided by
   http://disqus.com or http://intensedebate.com
-
 
 Ideas behind the separation of apps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +82,6 @@ Ideas behind the separation of apps
 
 * Stability: problems with the admin should not cause problems in the
   front-end and vice-versa
-
 
 Installation
 ------------
@@ -119,3 +122,13 @@ For FastCGI, Imposter comes with frontend.fcgi and admin.fcgi files.
 
 Check http://flask.pocoo.org/docs/deploying/ for more information
 concerning deployment.
+
+.. _Python: http://www.python.org
+.. _Flask: http://flask.pocoo.org
+.. _Werkzeug: http://werkzeug.pocoo.org
+.. _Jinja2: http://jinja.pocoo.org
+.. _SQLAlchemy: http://www.sqlalchemy.org
+.. _ReST: http://docutils.sourceforge.net/rst.html
+.. _Markdown: http://daringfireball.net/projects/markdown
+
+
