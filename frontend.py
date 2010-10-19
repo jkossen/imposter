@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # LICENSE {{{
 """
@@ -65,14 +66,20 @@ posts_base = db_session.query(Post, Status, User).filter(filter_public)
 # }}}
 
 # SHORTCUT FUNCTIONS {{{
-def get_route(function):
-    """Return complete route based on configuration and routes"""
-    return '/%s%s' % (app.config['FRONTEND_PREFIX'],
-                      app.config['FRONTEND_ROUTES'][function])
+def view(rule, **options):
+    """ Decorator for views """
+    complete_rule = '/%s%s' % (app.config['FRONTEND_PREFIX'],
+            app.config['FRONTEND_ROUTES'][rule])
 
-def themed(template):
-    """Return path to template in configured theme"""
-    return os.path.join('frontend', app.config['THEME'], template)
+    def decorator(f):
+        app.add_url_rule(complete_rule, None, f, **options)
+        return f
+    return decorator
+
+def render_themed(template, **options):
+    """ Render template from a configured subdir to implement themes """
+    template_path = os.path.join('frontend', app.config['THEME'], template)
+    return render_template(template_path, **options)
 
 def post_list(posts):
     """Render a list of posts"""
@@ -103,26 +110,26 @@ def to_html(content, format):
 # }}}
 
 # FRONTEND VIEWS {{{
-@app.route(get_route('static_files'))
+@view('static_files')
 def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
     static_path = os.path.join(app.root_path, 'templates', 'frontend',
                                app.config['THEME'], 'static')
     return send_from_directory(static_path, filename)
 
-@app.route(get_route('index'))
+@view('index')
 def show_index():
     """Render the frontpage"""
     posts = posts_base.order_by(Post.pubdate.desc())
     return post_list(posts)
 
-@app.route(get_route('show_post'))
+@view('show_post')
 def show_post(slug, **kwargs):
     """Render a Post"""
     post = posts_base.filter(Post.slug==slug).first()
-    return render_template(themed('post.html'), post=post[0])
+    return render_themed('post.html', post=post[0])
 
-@app.route(get_route('postlist_by_tag'))
+@view('postlist_by_tag')
 def show_postlist_by_tag(tag):
     """Render a post list filtered by tag"""
     tagobj = Tag.query.filter(Tag.value==tag).first()
@@ -136,13 +143,13 @@ def show_postlist_by_tag(tag):
 
 # TODO: Perhaps these should instead be part of the API app?
 
-@app.route(get_route('show_atom'))
+@view('show_atom')
 def show_atom():
     """Render atom feed of posts"""
     posts = posts_base.order_by(Post.pubdate.desc())[:app.config['FEEDITEMS']]
     return render_template(os.path.join('frontend', 'atom.xml'), posts=posts)
 
-@app.route(get_route('show_rss'))
+@view('show_rss')
 def show_rss():
     """Render RSS feed of posts"""
     posts = posts_base.order_by(Post.pubdate.desc())[:app.config['FEEDITEMS']]
