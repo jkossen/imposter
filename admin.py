@@ -58,6 +58,21 @@ db_session = DB(app.config['ADMIN_DATABASE']).get_session()
 # }}}
 
 # SHORTCUT FUNCTIONS {{{
+def view(rule, **options):
+    """ Decorator for views """
+    complete_rule = '/%s%s' % (app.config['ADMIN_PREFIX'],
+            app.config['ADMIN_ROUTES'][rule])
+
+    def decorator(f):
+        app.add_url_rule(complete_rule, None, f, **options)
+        return f
+    return decorator
+
+def render_themed(template, **options):
+    """ Render template from a configured subdir to implement themes """
+    template_path = os.path.join('admin', app.config['ADMIN_THEME'], template)
+    return render_template(template_path, **options)
+
 def login_required(fun):
     """Decorator for functions which require an authorized user"""
     @wraps(fun)
@@ -97,11 +112,6 @@ def get_post(post_id):
         abort(404)
 
     return post
-
-def get_route(function):
-    """Return complete route based on configuration and routes"""
-    return '/%s%s' % (app.config['ADMIN_PREFIX'],
-                      app.config['ADMIN_ROUTES'][function])
 # }}}
 
 # TEMPLATE FILTERS {{{
@@ -112,14 +122,13 @@ def strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
 # }}}
 
 # VIEWS {{{
-
-@app.route(get_route('static_files'))
+@view'static_files')
 def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
     static_path = os.path.join(app.root_path, 'templates', 'admin', 'static')
     return send_from_directory(static_path, filename)
 
-@app.route(get_route('login'), methods=['POST'])
+@view('login', methods=['POST'])
 def login():
     """Check user credentials and initialize session"""
     error = None
@@ -138,9 +147,9 @@ def login():
             return redirect(url_for('index'))
 
         error = 'Unknown user'
-    return render_template(os.path.join('admin', 'login.html'), error=error)
+    return render_themed('login.html', error=error)
 
-@app.route(get_route('logout'))
+@view('logout')
 @login_required
 def logout():
     """Clear the session"""
@@ -148,16 +157,16 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('index'))
 
-@app.route(get_route('index'))
+@view('index')
 @login_required
 def index():
     """The front page of this application"""
     posts = db_session.query(Post).filter(
         Post.user_id==session['user_id'])
-    return render_template(os.path.join('admin', 'index.html'), posts=posts)
+    return render_themed('index.html', posts=posts)
 
-@app.route(get_route('new_post'))
-@app.route(get_route('edit_post'))
+@view('new_post')
+@view('edit_post')
 @login_required
 def edit_post(post_id=None):
     """Render form to edit a Post"""
@@ -168,13 +177,13 @@ def edit_post(post_id=None):
     if post_id:
         post = get_post(post_id)
 
-    return render_template(os.path.join('admin', 'edit_post.html'),
+    return render_themed('edit_post.html',
                            post=post,
                            formats=formats,
                            statuses=statuses)
 
-@app.route(get_route('save_new_post'), methods=['POST'])
-@app.route(get_route('save_post'), methods=['POST'])
+@view('save_new_post', methods=['POST'])
+@view('save_post', methods=['POST'])
 @login_required
 def save_post(post_id=None):
     """Save changed Post content to database or save new Post"""
