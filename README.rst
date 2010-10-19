@@ -130,5 +130,3 @@ concerning deployment.
 .. _SQLAlchemy: http://www.sqlalchemy.org
 .. _ReST: http://docutils.sourceforge.net/rst.html
 .. _Markdown: http://daringfireball.net/projects/markdown
-
-
