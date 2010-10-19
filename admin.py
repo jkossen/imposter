@@ -122,7 +122,7 @@ def strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
 # }}}
 
 # VIEWS {{{
-@view'static_files')
+@view('static_files')
 def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
     static_path = os.path.join(app.root_path, 'templates', 'admin', 'static')
