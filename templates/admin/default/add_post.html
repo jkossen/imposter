@@ -1,4 +1,4 @@
-{% extends "admin/layout.html" %}
+{% extends "admin/default/layout.html" %}
 {% block body %}
   {% if session.username %}
     <form action="{{ url_for('save_post') }}" method=post class=add-post>
