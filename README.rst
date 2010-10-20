@@ -92,12 +92,13 @@ Imposter requires the following software:
 
 * Python (developed with 2.5 provided with Debian Lenny)
 * Flask
-* Werkzeug 
+* Werkzeug
 * Jinja2
 * SQLAlchemy
 * SQLAlchemy-migrate (database schema versioning)
 * docutils (provides ReST support)
 * Markdown
+* Flaskjk_ (my own library with generic Flask functions)
 
 As Imposter uses SQLAlchemy for its database abstraction layer, make
 sure you have a database supported by SQLAlchemy available.
@@ -130,3 +131,4 @@ concerning deployment.
 .. _SQLAlchemy: http://www.sqlalchemy.org
 .. _ReST: http://docutils.sourceforge.net/rst.html
 .. _Markdown: http://daringfireball.net/projects/markdown
+.. _Flaskjk: http://github.com/jkossen/flaskjk
