@@ -1,78 +1,41 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# LICENSE {{{
+# Description {{{
 """
-Imposter - Another weblog app
-Copyright (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
+    imposter.admin
+    ~~~~~~~~~~~~~~
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+    Admin interface for the Imposter weblog app
 
-   1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-   2. Redistributions in binary form must reproduce the above
-   copyright notice, this list of conditions and the following
-   disclaimer in the documentation and/or other materials provided
-   with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-This is the admin application code for Imposter. It's used for editing
-content, and every action requires a logged-in user.
-
+    :copyright: (c) 2010 by Jochem Kossen.
+    :license: BSD, see LICENSE.txt for more details.
 """
 # }}}
 
-# IMPORTS {{{
+# Imports {{{
 from __future__ import with_statement
-from flask import Flask, request, session, abort, redirect, url_for, \
-     render_template, send_from_directory, flash
+from flask import Flask, request, session, abort, redirect, url_for, flash
 from functools import wraps
 from database import DB
 from models import User, Tag, Format, Status, Post
 from datetime import datetime
 from sqlalchemy.sql import and_
-from helpers import hashify, slugify
+from flaskjk import Viewer, hashify, slugify
 
 import os
 import re
 # }}}
 
-# INITIALIZATION {{{
+# Initialization {{{
 app = Flask(__name__, static_path=None)
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('config_admin.py')
 app.config.from_envvar('IMPOSTER_ADMIN_CONFIG', silent=True)
-db_session = DB(app.config['ADMIN_DATABASE']).get_session()
+db_session = DB(app.config['DATABASE']).get_session()
+viewer = Viewer(app, 'admin')
 # }}}
 
-# SHORTCUT FUNCTIONS {{{
-def view(rule, **options):
-    """ Decorator for views """
-    complete_rule = '/%s%s' % (app.config['ADMIN_PREFIX'],
-            app.config['ADMIN_ROUTES'][rule])
-
-    def decorator(f):
-        app.add_url_rule(complete_rule, None, f, **options)
-        return f
-    return decorator
-
-def render_themed(template, **options):
-    """ Render template from a configured subdir to implement themes """
-    template_path = os.path.join('admin', app.config['ADMIN_THEME'], template)
-    return render_template(template_path, **options)
-
+# Shortcut functions {{{
 def login_required(fun):
     """Decorator for functions which require an authorized user"""
     @wraps(fun)
@@ -114,21 +77,20 @@ def get_post(post_id):
     return post
 # }}}
 
-# TEMPLATE FILTERS {{{
+# Template filters {{{
 @app.template_filter('strftime')
 def strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
     """Template filter for human-readable date formats"""
     return value.strftime(format)
 # }}}
 
-# VIEWS {{{
-@view('static_files')
+# Views {{{
+@viewer.view('static_files')
 def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
-    static_path = os.path.join(app.root_path, 'templates', 'admin', 'static')
-    return send_from_directory(static_path, filename)
+    return viewer.static(filename)
 
-@view('login', methods=['POST'])
+@viewer.view('login', methods=['POST'])
 def login():
     """Check user credentials and initialize session"""
     error = None
@@ -147,9 +109,9 @@ def login():
             return redirect(url_for('index'))
 
         error = 'Unknown user'
-    return render_themed('login.html', error=error)
+    return viewer.render('login.html', error=error)
 
-@view('logout')
+@viewer.view('logout')
 @login_required
 def logout():
     """Clear the session"""
@@ -157,16 +119,16 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('index'))
 
-@view('index')
+@viewer.view('index')
 @login_required
 def index():
     """The front page of this application"""
     posts = db_session.query(Post).filter(
         Post.user_id==session['user_id'])
-    return render_themed('index.html', posts=posts)
+    return viewer.render('index.html', posts=posts)
 
-@view('new_post')
-@view('edit_post')
+@viewer.view('new_post')
+@viewer.view('edit_post')
 @login_required
 def edit_post(post_id=None):
     """Render form to edit a Post"""
@@ -177,16 +139,20 @@ def edit_post(post_id=None):
     if post_id:
         post = get_post(post_id)
 
-    return render_themed('edit_post.html',
+    return viewer.render('edit_post.html',
                            post=post,
                            formats=formats,
                            statuses=statuses)
 
-@view('save_new_post', methods=['POST'])
-@view('save_post', methods=['POST'])
+@viewer.view('save_new_post', methods=['POST'])
+@viewer.view('save_post', methods=['POST'])
 @login_required
 def save_post(post_id=None):
-    """Save changed Post content to database or save new Post"""
+    """Save Post to database
+
+    If post_id is None a new Post will be inserted in the database. Otherwise
+    the existing Post will be updated.
+    """
     message = 'Post updated'
 
     if post_id is None:
@@ -231,7 +197,7 @@ def save_post(post_id=None):
 
 # }}}
 
-# MAIN RUN LOOP {{{
+# Main run loop {{{
 if __name__ == '__main__':
-    app.run(host=app.config['ADMIN_HOST'], port=app.config['ADMIN_PORT'])
+    app.run(host=app.config['HOST'], port=app.config['PORT'])
 # }}}
