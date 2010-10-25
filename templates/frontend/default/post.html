@@ -8,7 +8,7 @@ tags:
 {% endfor %}
 
 <p>
-    {{ post.content|to_html(post.format)|safe }}
+    {{ post.content_html|safe }}
 </p>
 
 {% endblock %}

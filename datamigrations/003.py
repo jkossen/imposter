@@ -15,4 +15,5 @@ def upgrade(app):
     db_session.commit()
 
 def downgrade(app):
+    # column is dropped, no changes needed
     pass

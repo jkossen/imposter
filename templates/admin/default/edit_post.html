@@ -27,6 +27,8 @@
                         {% endfor %}
                     </select>
             </td></tr>
+            <tr><td>Summary:</td>
+                <td><textarea name=summary rows=10 cols=80>{% if post %}{{ post.summary or '' }}{% endif %}</textarea></td></tr>
             <tr><td>Text:</td>
                 <td><textarea name=text rows=25 cols=80>{% if post %}{{ post.content }}{% endif %}</textarea></td></tr>
         </table>

@@ -21,7 +21,7 @@ from database import DB
 from models import User, Tag, Format, Status, Post
 from datetime import datetime
 from sqlalchemy.sql import and_
-from flaskjk import Viewer, hashify, slugify
+from flaskjk import Viewer, hashify, slugify, markup_to_html
 
 import os
 import re
@@ -105,7 +105,7 @@ def login():
             user = userquery.first()
             session['username'] = user.username
             session['user_id'] = user.id
-            flash('You were logged in')
+            flash('You\'re now logged in')
             return redirect(url_for('index'))
 
         error = 'Unknown user'
@@ -164,11 +164,16 @@ def save_post(post_id=None):
         post = get_post(post_id)
 
     post.title = request.form['title']
+    post.summary = request.form['summary']
     post.content = request.form['text']
     post.lastmoddate = datetime.now()
     post.format = get_format(request.form['format'])
     post.pubdate = datetime.strptime(request.form['pubdate'].strip(),
                                      '%Y-%m-%d %H:%M')
+
+    # compile input to html
+    post.summary_html = markup_to_html(post.format, post.summary)
+    post.content_html = markup_to_html(post.format, post.content) 
 
     # update pubdate if post's pubdate is None and its status is set
     # to public

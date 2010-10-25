@@ -2,12 +2,12 @@
 {% block body %}
   <ul class=posts>
   {% for post in posts %}
-    <li><h2>{{ post[0].pubdate|strftime(config.POST_DATETIME_FORMAT) }} <a href="{{ url_for('show_post', slug=post[0].slug, post_date=post[0].pubdate|strftime(config.POST_DATETIME_FORMAT)) }}">{{ post[0].title }}</a></h2>
+    <li><h2>{{ post[0].pubdate|strftime(config.POST_DATETIME_FORMAT) }} <a href="{{ url_for('show_post', slug=post[0].slug, year=post[0].year, month=post[0].month, day=post[0].day) }}">{{ post[0].title }}</a></h2>
         <p>
         {% if config.SUMMARIES %}
-        {{ post[0].content|summarize|to_html(post[0].format)|safe }}
+        {% if post[0].summary %}{{ post[0].summary_html|safe }}{% endif %}
         {% else %}
-        {{ post[0].content|to_html(post[0].format)|safe }}
+        {{ post[0].content_html|safe }}
         {% endif %}
         </p>
   {% else %}

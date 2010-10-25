@@ -51,8 +51,9 @@ class Tag(Base,ImposterBase):
 
     id = Column(Integer, primary_key=True)
     value = Column(String(64), nullable=False, unique=True)
+    count = Column(Integer, default=0)
 
-    __public_columns__ = [ value ]
+    __public_columns__ = [ value, count ]
 
     def __init__(self, value):
         self.value = value
@@ -88,6 +89,7 @@ class Post(Base,ImposterBase):
     id = Column(Integer, primary_key=True)
     title = Column(String(200), nullable=False)
     slug = Column(String(128), nullable=False)
+    summary = Column(Text, nullable=True)
     content = Column(Text, nullable=False)
     status_id = Column(Integer, ForeignKey(Status.id), nullable=False)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
@@ -102,10 +104,14 @@ class Post(Base,ImposterBase):
     tags = relationship('Tag', secondary=post_tags, backref='posts')
     format = relationship(Format, backref='posts')
 
-    __public_columns__ = [ title, slug, content, pubdate, lastmoddate ]
+    summary_html = Column(Text, nullable=True)
+    content_html = Column(Text, nullable=True)
 
-    def __init__(self, title=None, content=None, createdate=None, pubdate=None, lastmoddate=None):
+    __public_columns__ = [ title, slug, summary_html, content_html, pubdate, lastmoddate, tags ]
+
+    def __init__(self, title=None, summary=None, content=None, createdate=None, pubdate=None, lastmoddate=None):
         self.title = title
+        self.summary = summary
         self.content = content
         self.createdate = createdate
         self.pubdate = pubdate
@@ -113,4 +119,16 @@ class Post(Base,ImposterBase):
 
     def __repr__(self):
         return '<Post %s>' % self.title
+
+    @property
+    def year(self):
+        return self.pubdate.year
+
+    @property
+    def month(self):
+        return '%02d' % self.pubdate.month
+
+    @property
+    def day(self):
+        return '%02d' % self.pubdate.day
 

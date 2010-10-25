@@ -1,62 +1,74 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Description {{{
 """
-Imposter - Another weblog app
-Copyright (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
+    imposter.dbmanage
+    ~~~~~~~~~~~~~~~~~
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+    Application for maintaining the imposter database
 
-   1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-   2. Redistributions in binary form must reproduce the above
-   copyright notice, this list of conditions and the following
-   disclaimer in the documentation and/or other materials provided
-   with the distribution.
+    It's mostly used for updating the database schema and data when upgrading
+    to newer imposter versions.
 
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-This is the database management code for Imposter. It's used for
-installing a new Imposter database and upgrading it to newer versions.
-
+    :copyright: (c) 2010 by Jochem Kossen.
+    :license: BSD, see LICENSE.txt for more details.
 """
+# }}}
 
 from flask import Flask
-from migrate.versioning.api import version_control, upgrade
-from models import User, Tag, Status, Format, Post
+from migrate.versioning.api import version_control, upgrade, downgrade, db_version, version
+from sqlalchemy.sql import and_
+from models import User, Tag, Status, Format, Post, post_tags
 from database import DB
-from helpers import hashify, slugify
+from flaskjk import hashify, slugify
 from datetime import datetime
 
 import sys
 import getpass
+import datamigrations
 
 app = Flask(__name__, static_path=None)
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('config_admin.py')
 app.config.from_envvar('IMPOSTER_DBMANAGE_CONFIG', silent=True)
+db = app.config['DATABASE']
+repo = 'migrations/'
 
 def vc_db():
     """install SQLAlchemy-migrate versioning tables into database"""
-    version_control(url=app.config['ADMIN_DATABASE'], repository='migrations/')
+    version_control(url=db, repository=repo)
 
-def upgrade_db():
+def upgrade_db(v=None):
     """upgrade database schema to latest version"""
-    upgrade(url=app.config['ADMIN_DATABASE'], repository='migrations/')
+    from_version = db_version(url=db, repository=repo)
+    to_version = v
+    if to_version is None:
+        to_version = version(repository=repo)
+
+    print("Upgrading db from version %d to %d. " % (from_version, to_version))
+    print("Schema upgrade ... ")
+    upgrade(url=db, repository=repo, version=v)
+    print("Data upgrade ... ")
+    datamigrations.run_upgrade_scripts(app, from_version, to_version)
+    print("Done!")
+
+
+def downgrade_db(v):
+    """downgrade database schema to specified version"""
+    from_version = db_version(url=db, repository=repo)
+    to_version = int(v)
+
+    print("Downgrading db from version %d to %d. " % (from_version, to_version))
+    print("Schema upgrade ... ")
+    downgrade(url=db, repository=repo, version=v)
+    print("Data upgrade ... ")
+    datamigrations.run_downgrade_scripts(app, from_version, to_version)
+    print("Done!")
 
 def add_initial_data():
     """Insert initial data into the database"""
     # open database session
-    db_session = DB(app.config['ADMIN_DATABASE']).get_session()
+    db_session = DB(db).get_session()
 
     # ask user for an admin username and password
     username = raw_input('Please enter the admin username: ')
@@ -87,7 +99,7 @@ def add_initial_data():
     # build initial post and put it in the database
     initial_post_content = """
 Imposter was installed correctly!
-    
+
 This is just a sample post to show Imposter works.
 
 **Have a lot of fun blogging!**
@@ -112,7 +124,7 @@ def install_db():
 
 def usage():
     """show dbmanage.py usage"""
-    print 'usage: dbmanage.py install|upgrade'
+    print 'usage: dbmanage.py install|upgrade|downgrade version'
 
 #---------------------------------------------------------------------------
 # MAIN RUN LOOP
@@ -121,10 +133,12 @@ if __name__ == '__main__':
         usage()
         sys.exit(1)
 
-    if sys.argv[1] == 'install': 
+    if sys.argv[1] == 'install':
         install_db()
     elif sys.argv[1] == 'upgrade':
         upgrade_db()
+    elif sys.argv[1] == 'downgrade' and len(sys.argv) == 3:
+        downgrade_db(sys.argv[2])
     else:
         usage()
         sys.exit(1)

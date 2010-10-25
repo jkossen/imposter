@@ -43,9 +43,6 @@ SECRET_KEY = 'CHANGE_THIS'
 # Frontend prefix, ie the 'posts/' in http://yourweblog.net/posts/
 PREFIX='imposter/'
 
-# Date format to use in URL's. Don't set it to an empty string, adjust FRONTEND_ROUTES instead.
-URL_DATE_FORMAT = '%Y/%m/%d'
-
 # Date / time format to use in templates.
 POST_DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 
@@ -53,7 +50,7 @@ POST_DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 ROUTES = {
     'static_files': 'static/<path:filename>',
     'index': '',
-    'show_post': '<path:post_date>/<slug>.html',
+    'show_post': '<year>/<month>/<day>/<slug>.html',
     'show_rss': 'feed/rss/',
     'show_atom': 'feed/atom/',
     'postlist_by_tag': 'tag/<tag>/',

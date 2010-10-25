@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from migrate import *
-from helpers import tn
+from models import tn
 
 Base = declarative_base()
 meta = Base.metadata

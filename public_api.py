@@ -1,39 +1,20 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+# Description {{{
 """
-Imposter - Another weblog app
-Copyright (c) 2010 by Jochem Kossen <jochem.kossen@gmail.com>
+    imposter.public_api
+    ~~~~~~~~~~~~~~~~~~~
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+    Public API application for the Imposter weblog app
 
-   1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-   2. Redistributions in binary form must reproduce the above
-   copyright notice, this list of conditions and the following
-   disclaimer in the documentation and/or other materials provided
-   with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-This is the "public" api code for Imposter. It's used for retrieving
-public data from the database.
-
+    :copyright: (c) 2010 by Jochem Kossen.
+    :license: BSD, see LICENSE.txt for more details.
 """
+# }}}
 
-from flask import Flask, g, render_template, send_from_directory, abort, jsonify
-from flask.config import ConfigAttribute
+# {{{ Imports
+from flask import Flask, g, abort, jsonify
 from datetime import datetime
 from models import User, Tag, Status, Format, Post
 from sqlalchemy.sql import and_
@@ -41,12 +22,9 @@ from sqlalchemy.sql import and_
 from database import DB
 
 import os
+# }}}
 
-import helpers
-
-#---------------------------------------------------------------------------
-# INITIALIZATION
-
+# Initialization {{{
 app = Flask(__name__, static_path=None)
 app.config.from_pyfile('config.py')
 app.config.from_envvar('IMPOSTER_PUBLIC_API_CONFIG', silent=True)
@@ -62,8 +40,9 @@ filter_public = and_(Post.status_id==Status.id,
 # base query used in all frontend retrieve queries
 posts_base = db_session.query(Post, Status, User).filter(filter_public)
 
-#---------------------------------------------------------------------------
-# SHORTCUT FUNCTIONS
+# }}}
+
+# Shortcut functions {{{
 
 def get_route(function):
     """Return complete route based on configuration and routes"""
@@ -83,9 +62,9 @@ def shutdown_session(response):
     """End session, close database"""
     db_session.remove()
     return response
+# }}}
 
-#---------------------------------------------------------------------------
-# VIEWS
+# Views {{{
 
 @app.route(get_route('json_post_by_slug'))
 def json_post_by_slug(slug):
@@ -173,8 +152,10 @@ def json_sluglist_by_tag(tag):
         out['posts'].append(post[0].slug)
 
     return jsonify(out)
+# }}}
 
-#---------------------------------------------------------------------------
-# MAIN RUN LOOP
+# Main run loop {{{
 if __name__ == '__main__':
     app.run(host=app.config['PUBLIC_API_HOST'], port=app.config['PUBLIC_API_PORT'])
+# }}}
+
