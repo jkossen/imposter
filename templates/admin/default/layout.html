@@ -7,7 +7,7 @@
     </head>
     <body>
         <div class="page">
-            <h1><a href="/">{{ config.TITLE }} Admin</a></h1>
+            <h1><a href="/{{ config.PREFIX }}">{{ config.TITLE }} Admin</a></h1>
 
             {% if session.user_id %}
             <div class=metanav>
