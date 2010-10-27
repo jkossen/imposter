@@ -52,9 +52,11 @@ POST_DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 # Routes to the view functions in the frontend
 ROUTES = {
     'static_files': 'static/<path:filename>',
+    'uploads': 'uploads/<path:filename>',
     'index': '',
     'show_post': '<year>/<month>/<day>/<slug>.html',
     'show_rss': 'feed/rss/',
     'show_atom': 'feed/atom/',
     'postlist_by_tag': 'tag/<tag>/',
+    'postlist_by_username': 'user/<username>/',
     }
