@@ -60,3 +60,8 @@ ROUTES = {
     'save_new_post': 'save/',
     'save_post': 'save/<int:post_id>/',
     }
+
+# These keys will be replaced by their values before converting to html
+REPL_TAGS = {
+    '##UPLOADS##': 'https://my-website.org/uploads'
+}
