@@ -97,6 +97,9 @@ def add_initial_data():
     t2 = Tag('weblog')
 
     # build initial post and put it in the database
+    initial_post_summary = """
+Installed Correctly!
+"""
     initial_post_content = """
 Imposter was installed correctly!
 
@@ -104,7 +107,7 @@ This is just a sample post to show Imposter works.
 
 **Have a lot of fun blogging!**
 """
-    p1 = Post('Welcome to Imposter!', initial_post_content)
+    p1 = Post('Welcome to Imposter!', initial_post_summary, initial_post_content)
     p1.slug = slugify(p1.title)
     p1.createdate = datetime.now()
     p1.lastmoddate = datetime.now()
@@ -113,6 +116,7 @@ This is just a sample post to show Imposter works.
     p1.status = s3
     p1.user = u
     p1.tags = [t1, t2]
+    p1.compile()
     db_session.add(p1)
     db_session.commit()
 
