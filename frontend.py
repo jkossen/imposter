@@ -30,7 +30,7 @@ app = Flask(__name__, static_path=None)
 app.config.from_pyfile('config_frontend.py')
 app.config.from_envvar('IMPOSTER_FRONTEND_CONFIG', silent=True)
 db_session = DB(app.config['DATABASE']).get_session()
-viewer = Viewer(app, 'frontend')
+viewer = Viewer(app, 'frontend', app.config['UPLOAD_PATH'])
 
 # filter to make sure we only get posts which have status 'public'
 filter_public = and_(Post.status_id==Status.id,
@@ -78,6 +78,11 @@ def static(filename):
     """Send static files such as style sheets, JavaScript, etc."""
     return viewer.static(filename)
 
+@viewer.view('uploads')
+def uploaded(filename):
+    """Send static files from the uploads directory."""
+    return viewer.uploaded(filename)
+
 @viewer.view('index')
 def show_index():
     """Render the frontpage"""
@@ -97,6 +102,15 @@ def show_postlist_by_tag(tag):
     if tagobj is None:
         abort(404)
     posts = posts_base.filter(Post.tags.contains(tagobj))
+    return post_list(posts)
+
+@viewer.view('postlist_by_username')
+def show_postlist_by_username(username):
+    """Render a post list filtered by username"""
+    userobj = User.query.filter(User.username==username).first()
+    if userobj is None:
+        abort(404)
+    posts = posts_base.filter(Post.user==userobj)
     return post_list(posts)
 
 @viewer.view('show_atom')
