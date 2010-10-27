@@ -21,7 +21,7 @@ from database import DB
 from models import User, Tag, Format, Status, Post
 from datetime import datetime
 from sqlalchemy.sql import and_
-from flaskjk import Viewer, hashify, slugify, markup_to_html
+from flaskjk import Viewer, hashify, slugify
 
 import os
 import re
@@ -172,8 +172,7 @@ def save_post(post_id=None):
                                      '%Y-%m-%d %H:%M')
 
     # compile input to html
-    post.summary_html = markup_to_html(post.format, post.summary)
-    post.content_html = markup_to_html(post.format, post.content) 
+    post.compile()
 
     # update pubdate if post's pubdate is None and its status is set
     # to public
