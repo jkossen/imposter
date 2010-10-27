@@ -3,7 +3,7 @@ from sqlalchemy.orm import mapper, relation, relationship, backref
 from database import Base, ImposterBase
 from time import strftime
 from config import TABLEPREFIX
-from flaskjk import markup_to_html
+from flaskjk import markup_to_html, multi_replace
 
 def tn(tablename):
     """ shortcut to get tablename with prefix """
@@ -118,9 +118,15 @@ class Post(Base,ImposterBase):
         self.pubdate = pubdate
         self.lastmoddate = lastmoddate
 
-    def compile(self):
-        self.summary_html = markup_to_html(self.format, self.summary)
-        self.content_html = markup_to_html(self.format, self.content)
+    def compile(self, repl=None):
+        input_summary = self.summary
+        input_content = self.content
+        if repl is not None:
+            input_summary = multi_replace(input_summary, repl)
+            input_content = multi_replace(input_content, repl)
+
+        self.summary_html = markup_to_html(self.format, input_summary)
+        self.content_html = markup_to_html(self.format, input_content)
 
     def __repr__(self):
         return '<Post %s>' % self.title
