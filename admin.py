@@ -172,7 +172,7 @@ def save_post(post_id=None):
                                      '%Y-%m-%d %H:%M')
 
     # compile input to html
-    post.compile()
+    post.compile(app.config['REPL_TAGS'])
 
     # update pubdate if post's pubdate is None and its status is set
     # to public
