@@ -13,6 +13,9 @@ FRONTEND_BASEURL='http://CHANGE_THIS.ORG/imposter'
 # Database connection strings, example: postgres://imposter:mysecretpassword@localhost:5432/imposter
 DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
 
+# Path to directory where uploaded files reside
+UPLOAD_PATH = '/var/www/my-site.org/uploads/'
+
 # Theme
 THEME = 'default'
 
