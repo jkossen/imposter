@@ -55,6 +55,13 @@ def shutdown_session(response):
     return response
 # }}}
 
+# Context Processors {{{
+@app.context_processor
+def inject_recent_posts():
+    return dict(recent_posts=posts_base.order_by(Post.pubdate.desc())[0:10])
+
+# }}}
+
 # Template filters {{{
 @app.template_filter('strftime')
 def tf_strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
@@ -101,7 +108,7 @@ def show_postlist_by_tag(tag):
     tagobj = Tag.query.filter(Tag.value==tag).first()
     if tagobj is None:
         abort(404)
-    posts = posts_base.filter(Post.tags.contains(tagobj))
+    posts = posts_base.filter(Post.tags.contains(tagobj)).order_by(Post.pubdate.desc())
     return post_list(posts)
 
 @viewer.view('postlist_by_username')
@@ -110,7 +117,7 @@ def show_postlist_by_username(username):
     userobj = User.query.filter(User.username==username).first()
     if userobj is None:
         abort(404)
-    posts = posts_base.filter(Post.user==userobj)
+    posts = posts_base.filter(Post.user==userobj).order_by(Post.pubdate.desc())
     return post_list(posts)
 
 @viewer.view('show_atom')
