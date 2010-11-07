@@ -18,7 +18,7 @@ from __future__ import with_statement
 from flask import Flask, request, session, abort, redirect, url_for, flash
 from functools import wraps
 from database import DB
-from models import User, Tag, Format, Status, Post
+from models import User, Tag, Format, Status, Post, post_tags
 from datetime import datetime
 from sqlalchemy.sql import and_
 from flaskjk import Viewer, hashify, slugify
@@ -33,6 +33,16 @@ app.config.from_pyfile('config_admin.py')
 app.config.from_envvar('IMPOSTER_ADMIN_CONFIG', silent=True)
 db_session = DB(app.config['DATABASE']).get_session()
 viewer = Viewer(app, 'admin')
+
+# filter to make sure we only get posts which have status 'public'
+filter_public = and_(Post.status_id==Status.id,
+                 Status.value=='public',
+                 Post.user_id==User.id,
+                 Post.pubdate <= datetime.now()
+                 )
+
+# base query used in all frontend retrieve queries
+public_posts_base = db_session.query(Post, Status, User).filter(filter_public)
 # }}}
 
 # Shortcut functions {{{
@@ -127,6 +137,17 @@ def index():
         Post.user_id==session['user_id'])
     return viewer.render('index.html', posts=posts)
 
+def recalculate_tagcount(tag):
+    tag.count = public_posts_base.filter(Post.tags.contains(tag)).count()
+
+@viewer.view('recalculate_tagcounts')
+@login_required
+def recalculate_tagcounts():
+    for tag in db_session.query(Tag):
+        recalculate_tagcount(tag)
+    db_session.commit()
+    return redirect(url_for('index'))
+
 @viewer.view('new_post')
 @viewer.view('edit_post')
 @login_required
@@ -154,6 +175,7 @@ def save_post(post_id=None):
     the existing Post will be updated.
     """
     message = 'Post updated'
+    orig_tags = []
 
     if post_id is None:
         post = Post(request.form['title'], request.form['text'])
@@ -162,6 +184,7 @@ def save_post(post_id=None):
         post.createdate = datetime.now()
     else:
         post = get_post(post_id)
+        orig_tags = [tag for tag in post.tags]
 
     post.title = request.form['title']
     post.summary = request.form['summary']
@@ -192,6 +215,15 @@ def save_post(post_id=None):
     if post_id is None:
         db_session.add(post)
         message = 'New post was successfully added'
+
+    db_session.commit()
+
+    for tag in orig_tags:
+        recalculate_tagcount(tag)
+
+    for tag in post.tags:
+        if tag not in orig_tags:
+            recalculate_tagcount(tag)
 
     db_session.commit()
 
