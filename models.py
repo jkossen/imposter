@@ -143,3 +143,42 @@ class Post(Base,ImposterBase):
     def day(self):
         return '%02d' % self.pubdate.day
 
+class Page(Base):
+    __tablename__ = tn('pages')
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(200), unique=True, nullable=False)
+    slug = Column(String(128), unique=True, nullable=False)
+    content = Column(Text, nullable=False)
+    status_id = Column(Integer, ForeignKey(Status.id), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    format_id = Column(Integer, ForeignKey(Format.id), nullable=False)
+    content_html = Column(Text, nullable=True)
+
+    createdate = Column(DateTime, nullable=False)
+    pubdate = Column(DateTime, nullable=True)
+    lastmoddate = Column(DateTime, nullable=False)
+
+    status = relationship(Status, backref='posts')
+    user = relationship(User, backref='posts')
+    format = relationship(Format, backref='posts')
+
+    __public_columns__ = [ title, slug, content_html, pubdate, lastmoddate ]
+
+    def __init__(self, title=None, content=None, createdate=None, pubdate=None, lastmoddate=None):
+        self.title = title
+        self.content = content
+        self.createdate = createdate
+        self.pubdate = pubdate
+        self.lastmoddate = lastmoddate
+
+    def compile(self, repl=None):
+        input_content = self.content
+        if repl is not None:
+            input_content = multi_replace(input_content, repl)
+
+        self.content_html = markup_to_html(self.format, input_content)
+
+    def __repr__(self):
+        return '<Page %s>' % self.title
+
