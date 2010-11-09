@@ -1,11 +1,22 @@
 {% extends "admin/default/layout.html" %}
 {% block body %}
+<h2>Posts</h2>
 <table style="width:100%;">
 <tr><th>creation date</th><th>publication date</th><th>title</th></tr>
   {% for post in posts %}
     <tr class="{{ loop.cycle('odd', 'even') }}"><td>{{ post.createdate|strftime(config.POST_DATETIME_FORMAT) }}</td><td>{% if post.pubdate %}{{ post.pubdate|strftime(config.POST_DATETIME_FORMAT) }}{% endif %}</td><td><a href="{{ url_for('edit_post', post_id=post.id) }}">{{ post.title }}</a></td></tr>
   {% else %}
     <li><em>Unbelievable. No posts here so far</em>
+  {% endfor %}
+</table>
+<hr />
+<h2>Pages</h2>
+<table style="width:100%;">
+<tr><th>creation date</th><th>publication date</th><th>title</th></tr>
+  {% for page in pages %}
+    <tr class="{{ loop.cycle('odd', 'even') }}"><td>{{ page.createdate|strftime(config.POST_DATETIME_FORMAT) }}</td><td>{% if page.pubdate %}{{ page.pubdate|strftime(config.POST_DATETIME_FORMAT) }}{% endif %}</td><td><a href="{{ url_for('edit_page', page_id=page.id) }}">{{ page.title }}</a></td></tr>
+  {% else %}
+    <li><em>Unbelievable. No pages here so far</em>
   {% endfor %}
 </table>
 {% endblock %}
