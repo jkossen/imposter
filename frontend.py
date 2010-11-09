@@ -15,12 +15,12 @@
 
 # Imports {{{
 from flask import Flask, abort
-from datetime import datetime
-from models import User, Tag, Status, Post
-from sqlalchemy.sql import and_
+from datetime import date, datetime
+from models import User, Tag, Status, Post, Page
+from sqlalchemy.sql import select, and_, func
 
 from database import DB
-from flaskjk import Viewer, summarize, markup_to_html
+from flaskjk import Viewer, Paginator, summarize, markup_to_html
 
 import os
 # }}}
@@ -41,13 +41,12 @@ filter_public = and_(Post.status_id==Status.id,
 
 # base query used in all frontend retrieve queries
 posts_base = db_session.query(Post, Status, User).filter(filter_public)
+pages_base = db_session.query(Page, Status, User).filter(and_(Page.status_id==Status.id,
+                                        Status.value=='public',
+                                        Page.pubdate <= datetime.now()))
 # }}}
 
 # Shortcut functions {{{
-def post_list(posts):
-    """Render a list of posts"""
-    return viewer.render('post_list.html', posts=posts)
-
 @app.after_request
 def shutdown_session(response):
     """End session, close database"""
@@ -57,9 +56,37 @@ def shutdown_session(response):
 
 # Context Processors {{{
 @app.context_processor
+def inject_pages():
+    pages = pages_base
+    return dict(pages=pages)
+
+@app.context_processor
 def inject_recent_posts():
     return dict(recent_posts=posts_base.order_by(Post.pubdate.desc())[0:10])
 
+@app.context_processor
+def inject_tag_cloud():
+    tags = db_session.query(Tag).filter(Tag.count>=1).order_by(Tag.count.desc())[0:100]
+
+    min_percent = 100
+    max_percent = 150
+    min = tags[-1].count
+    max = tags[0].count
+
+    tags_sizes = []
+    for tag in tags:
+        size = min_percent + ((max-(max-(tag.count-min)))*(max_percent-min_percent)/(max-min))
+        tags_sizes.append([tag, size])
+
+    return dict(tags=sorted(tags_sizes, key=lambda tag:tag[0].value))
+
+@app.context_processor
+def inject_archives():
+    min_max_pubdates = db_session.query(func.min(Post.pubdate), func.max(Post.pubdate)).filter(filter_public)
+    #min_year = min_max_pubdates[0].year()
+    #max_year = min_max_pubdates[1].year()
+    #archives = []
+    return dict(min_max_pubdates=min_max_pubdates)
 # }}}
 
 # Template filters {{{
@@ -93,32 +120,72 @@ def uploaded(filename):
 @viewer.view('index')
 def show_index():
     """Render the frontpage"""
-    posts = posts_base.order_by(Post.pubdate.desc())
-    return post_list(posts)
+    return show_postlist()
 
 @viewer.view('show_post')
 def show_post(slug, **kwargs):
     """Render a Post"""
-    post = posts_base.filter(Post.slug==slug).first()
+    query = posts_base.filter(Post.slug==slug)
+    if query.count() < 1:
+        abort(404)
+    post = query.first()
     return viewer.render('post.html', post=post[0])
 
-@viewer.view('postlist_by_tag')
-def show_postlist_by_tag(tag):
+@viewer.view('show_page')
+def show_page(slug, **kwargs):
+    """Render a Page"""
+    query = pages_base.filter(Page.slug==slug)
+    if query.count() < 1:
+        abort(404)
+    page = query.first()
+    return viewer.render('page.html', page=page[0])
+
+@viewer.view('show_postlist')
+def show_postlist(page=1):
+    """Render the frontpage"""
+    posts = posts_base.order_by(Post.pubdate.desc())
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page, 'show_postlist')
+    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+
+@viewer.view('show_postlist_by_month_index')
+@viewer.view('show_postlist_by_month')
+def show_postlist_by_month(year, month, page=1):
+    """Render a post list filtered by month"""
+    start_of_month = date(int(year), int(month), 1)
+    next_month = date(int(year)+((int(month)+1)/12), (int(month)+1) % 12, 1)
+    posts = posts_base.filter(Post.pubdate > start_of_month).filter(Post.pubdate <= next_month).order_by(Post.pubdate.desc())
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page, 'show_postlist_by_month', year=year, month=month)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+
+@viewer.view('show_postlist_by_year_index')
+@viewer.view('show_postlist_by_year')
+def show_postlist_by_year(year, page=1):
+    """Render a post list filtered by year"""
+    year = int(year)
+    posts = posts_base.filter(Post.pubdate > date(year, 1, 1)).filter(Post.pubdate <= date(year+1, 1, 1)).order_by(Post.pubdate.desc())
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page, 'show_postlist_by_year', year=year)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+
+@viewer.view('show_postlist_by_tag_index')
+@viewer.view('show_postlist_by_tag')
+def show_postlist_by_tag(tag, page=1):
     """Render a post list filtered by tag"""
     tagobj = Tag.query.filter(Tag.value==tag).first()
     if tagobj is None:
         abort(404)
     posts = posts_base.filter(Post.tags.contains(tagobj)).order_by(Post.pubdate.desc())
-    return post_list(posts)
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page, 'show_postlist_by_tag', tag=tag)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator)
 
-@viewer.view('postlist_by_username')
-def show_postlist_by_username(username):
+@viewer.view('show_postlist_by_username')
+def show_postlist_by_username(username, page=1):
     """Render a post list filtered by username"""
     userobj = User.query.filter(User.username==username).first()
     if userobj is None:
         abort(404)
     posts = posts_base.filter(Post.user==userobj).order_by(Post.pubdate.desc())
-    return post_list(posts)
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page, 'show_postlist_by_username', username=username)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator)
 
 @viewer.view('show_atom')
 def show_atom():
