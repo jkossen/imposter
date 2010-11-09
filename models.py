@@ -159,9 +159,9 @@ class Page(Base):
     pubdate = Column(DateTime, nullable=True)
     lastmoddate = Column(DateTime, nullable=False)
 
-    status = relationship(Status, backref='posts')
-    user = relationship(User, backref='posts')
-    format = relationship(Format, backref='posts')
+    status = relationship(Status, backref='pages')
+    user = relationship(User, backref='pages')
+    format = relationship(Format, backref='pages')
 
     __public_columns__ = [ title, slug, content_html, pubdate, lastmoddate ]
 
