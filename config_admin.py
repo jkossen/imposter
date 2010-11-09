@@ -55,10 +55,15 @@ ROUTES = {
     'index': '',
     'login': 'login/',
     'logout': 'logout/',
-    'new_post': 'edit/',
-    'edit_post': 'edit/<int:post_id>/',
-    'save_new_post': 'save/',
-    'save_post': 'save/<int:post_id>/',
+    'new_post': 'post/new/edit/',
+    'new_page': 'page/new/edit/',
+    'edit_post': 'post/<int:post_id>/edit/',
+    'edit_page': 'page/<int:page_id>/edit/',
+    'save_new_post': 'post/new/save/',
+    'save_new_page': 'page/new/save/',
+    'save_post': 'post/<int:post_id>/save/',
+    'save_page': 'page/<int:page_id>/save/',
+    'recalculate_tagcounts': 'tags/recalculate/',
     }
 
 # These keys will be replaced by their values before converting to html
