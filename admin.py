@@ -18,7 +18,7 @@ from __future__ import with_statement
 from flask import Flask, request, session, abort, redirect, url_for, flash
 from functools import wraps
 from database import DB
-from models import User, Tag, Format, Status, Post, post_tags
+from models import User, Tag, Format, Status, Post, Page, post_tags
 from datetime import datetime
 from sqlalchemy.sql import and_
 from flaskjk import Viewer, hashify, slugify
@@ -85,6 +85,15 @@ def get_post(post_id):
         abort(404)
 
     return post
+
+def get_page(page_id):
+    """ Retrieve Page object based on given Page id"""
+    page = Page.query.filter(and_(Page.user_id==session['user_id'],
+                                  Page.id==page_id)).first()
+    if page is None:
+        abort(404)
+
+    return page
 # }}}
 
 # Template filters {{{
@@ -135,7 +144,9 @@ def index():
     """The front page of this application"""
     posts = db_session.query(Post).filter(
         Post.user_id==session['user_id'])
-    return viewer.render('index.html', posts=posts)
+    pages = db_session.query(Page).filter(
+        Page.user_id==session['user_id'])
+    return viewer.render('index.html', posts=posts, pages=pages)
 
 def recalculate_tagcount(tag):
     tag.count = public_posts_base.filter(Post.tags.contains(tag)).count()
@@ -162,6 +173,23 @@ def edit_post(post_id=None):
 
     return viewer.render('edit_post.html',
                            post=post,
+                           formats=formats,
+                           statuses=statuses)
+
+@viewer.view('new_page')
+@viewer.view('edit_page')
+@login_required
+def edit_page(page_id=None):
+    """Render form to edit a Page"""
+    formats = db_session.query(Format).all()
+    statuses = db_session.query(Status).all()
+    page = None
+
+    if page_id:
+        page = get_page(page_id)
+
+    return viewer.render('edit_page.html',
+                           page=page,
                            formats=formats,
                            statuses=statuses)
 
@@ -210,7 +238,8 @@ def save_post(post_id=None):
     post.tags = [get_tag(tag) for tag \
                  in sep.split(request.form['tags'].lower())]
 
-    post.slug = slugify(post.title)
+    if post.slug is None:
+        post.slug = slugify(post.title)
 
     if post_id is None:
         db_session.add(post)
@@ -230,6 +259,56 @@ def save_post(post_id=None):
     flash(message)
 
     return redirect(url_for('edit_post', post_id=post_id))
+
+@viewer.view('save_new_page', methods=['POST'])
+@viewer.view('save_page', methods=['POST'])
+@login_required
+def save_page(page_id=None):
+    """Save Page to database
+
+    If page_id is None a new Page will be inserted in the database. Otherwise
+    the existing Page will be updated.
+    """
+    message = 'Page updated'
+
+    if page_id is None:
+        page = Page(request.form['title'], request.form['text'])
+        page.status_id = 1
+        page.user_id = session['user_id']
+        page.createdate = datetime.now()
+    else:
+        page = get_page(page_id)
+
+    page.title = request.form['title']
+    page.content = request.form['text']
+    page.lastmoddate = datetime.now()
+    page.format = get_format(request.form['format'])
+    page.pubdate = datetime.strptime(request.form['pubdate'].strip(),
+                                     '%Y-%m-%d %H:%M')
+
+    # compile input to html
+    page.compile(app.config['REPL_TAGS'])
+
+    # update pubdate if page's pubdate is None and its status is set
+    # to public
+    if request.form['status'] == 'public' and \
+           unicode(page.status) != 'public' and \
+           page.pubdate is None:
+        page.pubdate = datetime.now()
+
+    page.status = get_status(request.form['status'])
+
+    page.slug = slugify(page.title)
+
+    if page_id is None:
+        db_session.add(page)
+        message = 'New page was successfully added'
+
+    db_session.commit()
+
+    flash(message)
+
+    return redirect(url_for('edit_page', page_id=page_id))
 
 # }}}
 
