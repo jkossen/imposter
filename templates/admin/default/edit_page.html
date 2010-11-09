@@ -1,0 +1,36 @@
+{% extends "admin/default/layout.html" %} {% block body %}
+<h1>{% if page %}{{ page.title }}{% endif %}</h1>
+<p>
+    {% if session.username %}
+    <form action="{% if page %}{{ url_for('save_page', page_id=page.id) }}{% else %}{{ url_for('save_page') }}{% endif %}" method=post class=save-page>
+        <table style="width:100%">
+            <tr><td>Title:</td><td><input type=text size=50 name=title value="{% if page %}{{ page.title }}{% endif %}"></td></tr>
+            {% if page %}
+            <tr><td>Creation date:</td><td>{{ page.createdate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
+            <tr><td>Last modified:</td><td>{{ page.lastmoddate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
+            {% endif %}
+            <tr><td>Publication date:</td><td><input type="text" size="20" name="pubdate" value="{% if page %}{{ page.pubdate|strftime(config.POST_DATETIME_FORMAT) }}{% endif %}" /></td></tr>
+            <tr><td>Format:</td>
+                <td><select name="format">
+                        <option>Pick ...</option>
+                        {% for f in formats %}
+                        <option value="{{ f }}" {% if page and page.format == f %}selected="selected"{% endif %}>{{ f }}</option>
+                        {% endfor %}
+                    </select>
+            </td></tr>
+            <tr><td>Status:</td>
+                <td><select name="status">
+                        <option>Pick ...</option>
+                        {% for s in statuses %}
+                        <option value="{{ s }}" {% if page and page.status == s %}selected="selected"{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+            </td></tr>
+            <tr><td>Text:</td>
+                <td><textarea name=text rows=25 cols=80>{% if page %}{{ page.content }}{% endif %}</textarea></td></tr>
+        </table>
+        <input type="submit" value="Save" />
+    </form>
+    {% endif %}
+</p>
+{% endblock %}
