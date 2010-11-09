@@ -25,6 +25,9 @@ SUMMARIES = True
 # How many items do you want in feeds?
 FEEDITEMS = 10
 
+# How many posts doe you want to show in a list?
+ENTRIES_PER_PAGE = 10
+
 # Summary size in characters
 SUMMARY_SIZE = 200
 
@@ -54,9 +57,16 @@ ROUTES = {
     'static_files': 'static/<path:filename>',
     'uploads': 'uploads/<path:filename>',
     'index': '',
-    'show_post': '<year>/<month>/<day>/<slug>.html',
+    'show_postlist': 'list/<int:page>.html',
+    'show_postlist_by_year_index': '<int:year>/',
+    'show_postlist_by_year': '<int:year>/<int:page>.html',
+    'show_postlist_by_month_index': '<int:year>/<month>/',
+    'show_postlist_by_month': '<int:year>/<month>/<int:page>.html',
+    'show_postlist_by_tag_index': 'tag/<tag>/',
+    'show_postlist_by_tag': 'tag/<tag>/<int:page>.html',
+    'show_postlist_by_username': 'user/<username>/<int:page>.html',
+    'show_post': '<int:year>/<month>/<day>/<slug>.html',
+    'show_page': 'page/<slug>.html',
     'show_rss': 'feed/rss/',
     'show_atom': 'feed/atom/',
-    'postlist_by_tag': 'tag/<tag>/',
-    'postlist_by_username': 'user/<username>/',
     }
