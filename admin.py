@@ -298,7 +298,8 @@ def save_page(page_id=None):
 
     page.status = get_status(request.form['status'])
 
-    page.slug = slugify(page.title)
+    if page.slug is None:
+        page.slug = slugify(page.title)
 
     if page_id is None:
         db_session.add(page)
