@@ -36,4 +36,16 @@
     </form>
     {% endif %}
 </p>
+<hr />
+
+<h2>Preview</h2>
+<h3>Summary</h3>
+<div id="preview_summary">
+{{ post.summary_html|safe }}
+</div>
+
+<h3>Content</h3>
+<div id="preview_content">
+{{ post.content_html|safe }}
+</div>
 {% endblock %}
