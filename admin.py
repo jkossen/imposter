@@ -143,7 +143,7 @@ def logout():
 def index():
     """The front page of this application"""
     posts = db_session.query(Post).filter(
-        Post.user_id==session['user_id'])
+        Post.user_id==session['user_id']).order_by(Post.pubdate.desc())
     pages = db_session.query(Page).filter(
         Page.user_id==session['user_id'])
     return viewer.render('index.html', posts=posts, pages=pages)
