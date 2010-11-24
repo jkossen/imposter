@@ -31,19 +31,19 @@ app.config.from_pyfile('config_frontend.py')
 app.config.from_envvar('IMPOSTER_FRONTEND_CONFIG', silent=True)
 db_session = DB(app.config['DATABASE']).get_session()
 viewer = Viewer(app, 'frontend', app.config['UPLOAD_PATH'])
-
-# filter to make sure we only get posts which have status 'public'
-filter_public = and_(Post.status_id==Status.id,
-                 Status.value=='public',
-                 Post.user_id==User.id,
-                 Post.pubdate <= datetime.now()
-                 )
 # }}}
 
 # Shortcut functions {{{
+def filter_public():
+    return and_(Post.status_id==Status.id,
+            Status.value=='public',
+            Post.user_id==User.id,
+            Post.pubdate <= datetime.now()
+            )
+
 def posts_base():
     """ base query to make sure we get only published posts """
-    return db_session.query(Post, Status, User).filter(filter_public)
+    return db_session.query(Post, Status, User).filter(filter_public())
 
 def pages_base():
     """ base query to make sure we get only published pages """
@@ -86,7 +86,7 @@ def inject_tag_cloud():
 
 @app.context_processor
 def inject_archives():
-    min_max_pubdates = db_session.query(func.min(Post.pubdate), func.max(Post.pubdate)).filter(filter_public)
+    min_max_pubdates = db_session.query(func.min(Post.pubdate), func.max(Post.pubdate)).filter(filter_public())
     #min_year = min_max_pubdates[0].year()
     #max_year = min_max_pubdates[1].year()
     #archives = []
