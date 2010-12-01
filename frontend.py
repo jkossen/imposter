@@ -51,7 +51,6 @@ def pages_base():
         Status.value=='public',
         Page.pubdate <= datetime.now()))
 
-
 @app.after_request
 def shutdown_session(response):
     """End session, close database"""
@@ -70,10 +69,10 @@ def inject_recent_posts():
 
 @app.context_processor
 def inject_tag_cloud():
-    tags = db_session.query(Tag).filter(Tag.count>=1).order_by(Tag.count.desc())[0:100]
+    tags = db_session.query(Tag).filter(Tag.count>=1).order_by(Tag.count.desc())[0:app.config['TAGCLOUD_NR_OF_TAGS']]
 
-    min_percent = 85
-    max_percent = 200
+    min_percent = app.config['TAGCLOUD_MIN_FONTSIZE']
+    max_percent = app.config['TAGCLOUD_MAX_FONTSIZE']
     min = tags[-1].count
     max = tags[0].count
 

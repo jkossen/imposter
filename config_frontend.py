@@ -22,6 +22,13 @@ THEME = 'default'
 # Show summaries instead of full posts in feed content, post lists and front page?
 SUMMARIES = True
 
+# Nr of tags to show in the tag cloud
+TAGCLOUD_NR_OF_TAGS = 100
+
+# Range of fontsizes for the tagcloud in percentages
+TAGCLOUD_MIN_FONTSIZE = 85
+TAGCLOUD_MAX_FONTSIZE = 200
+
 # How many items do you want in feeds?
 FEEDITEMS = 10
 
