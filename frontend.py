@@ -155,8 +155,8 @@ def show_postlist(page=1):
 def show_postlist_by_month(year, month, page=1):
     """Render a post list filtered by month"""
     start_of_month = date(int(year), int(month), 1)
-    next_month = date(int(year)+((int(month)+1)/12), (int(month)+1) % 12, 1)
-    posts = posts_base().filter(Post.pubdate > start_of_month).filter(Post.pubdate <= next_month).order_by(Post.pubdate.desc())
+    next_month = date(int(year) + abs(int(month)/12), (int(month) % 12)+1, 1)
+    posts = posts_base().filter(Post.pubdate > start_of_month).filter(Post.pubdate < next_month).order_by(Post.pubdate.desc())
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page, 'show_postlist_by_month', year=year, month=month)
     return viewer.render('post_list.html', posts=posts, paginator=paginator)
 
