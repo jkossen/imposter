@@ -122,8 +122,10 @@ def uploaded(filename):
 
 @viewer.view('index')
 def show_index():
-    """Render the frontpage"""
-    return show_postlist()
+    """Render the front page"""
+    posts = posts_base().order_by(Post.pubdate.desc())
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], 1, 'show_postlist')
+    return viewer.render('index.html', posts=posts, paginator=paginator)
 
 @viewer.view('show_post')
 def show_post(slug, **kwargs):
@@ -145,7 +147,7 @@ def show_page(slug, **kwargs):
 
 @viewer.view('show_postlist')
 def show_postlist(page=1):
-    """Render the frontpage"""
+    """Render a paginated post list"""
     posts = posts_base().order_by(Post.pubdate.desc())
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page, 'show_postlist')
     return viewer.render('post_list.html', posts=posts, paginator=paginator)
