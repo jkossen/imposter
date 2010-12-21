@@ -45,7 +45,12 @@ def posts_base():
     return db_session.query(Post, Status, User).filter(filter_public())
 
 def get_posts(filter=None, order=None):
-    """Shortcut function to get a query result filtered by given filter, ordered by given order"""
+    """Shortcut function to get a query result filtered by given filter,
+    ordered by given order
+
+    :param filter: SQLAlchemy filter statement
+    :param order: SQLAlchemy order_by statement
+    """
     ret = posts_base()
     if filter is not None:
         ret = ret.filter(filter)
