@@ -44,18 +44,18 @@ def posts_base():
     """Base query to make sure we get only published posts"""
     return db_session.query(Post, Status, User).filter(filter_public())
 
-def get_posts(filter=None, order=None):
+def get_posts(p_filter=None, p_order=None):
     """Shortcut function to get a query result filtered by given filter,
     ordered by given order
 
-    :param filter: SQLAlchemy filter statement
-    :param order: SQLAlchemy order_by statement
+    :param p_filter: SQLAlchemy filter statement
+    :param p_order: SQLAlchemy p_order statement
     """
     ret = posts_base()
-    if filter is not None:
-        ret = ret.filter(filter)
-    if order is not None:
-        ret = ret.order_by(order)
+    if p_filter is not None:
+        ret = ret.filter(p_filter)
+    if p_order is not None:
+        ret = ret.order_by(p_order)
     return ret
 
 def pages_base():
@@ -82,8 +82,8 @@ def inject_pages():
 @app.context_processor
 def inject_recent_posts():
     """Add most recent post list to template context"""
-    order = Post.pubdate.desc()
-    recent_posts = get_posts(None, order)[0:10]
+    p_order = Post.pubdate.desc()
+    recent_posts = get_posts(None, p_order)[0:10]
     return dict(recent_posts=recent_posts)
 
 @app.context_processor
@@ -163,8 +163,8 @@ def show_index():
 @viewer.view('show_post')
 def show_post(slug, **kwargs):
     """Render a Post"""
-    filter = Post.slug==slug
-    query = get_posts(filter)
+    p_filter = Post.slug == slug
+    query = get_posts(p_filter)
 
     # No result means the page doesn't exist
     if query.count() < 1:
@@ -176,8 +176,8 @@ def show_post(slug, **kwargs):
 @viewer.view('show_page')
 def show_page(slug, **kwargs):
     """Render a Page"""
-    filter = Page.slug==slug
-    query = pages_base().filter(filter)
+    p_filter = Page.slug == slug
+    query = pages_base().filter(p_filter)
     # No result means the page doesn't exist
     if query.count() < 1:
         abort(404)
@@ -187,8 +187,8 @@ def show_page(slug, **kwargs):
 @viewer.view('show_postlist')
 def show_postlist(page=1):
     """Render a paginated post list"""
-    order = Post.pubdate.desc()
-    posts = get_posts(None, order)
+    p_order = Post.pubdate.desc()
+    posts = get_posts(None, p_order)
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist')
     return viewer.render('post_list.html', posts=posts, paginator=paginator)
@@ -202,9 +202,9 @@ def show_postlist_by_month(year, month, page=1):
 
     start_of_month = date(year, month, 1)
     next_month = date(year + abs(month/12), (month % 12)+1, 1)
-    filter = and_(Post.pubdate > start_of_month, Post.pubdate < next_month)
-    order = Post.pubdate.desc()
-    posts = get_posts(filter, order)
+    p_filter = and_(Post.pubdate > start_of_month, Post.pubdate < next_month)
+    p_order = Post.pubdate.desc()
+    posts = get_posts(p_filter, p_order)
 
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_month', year=year, month=month)
@@ -217,11 +217,11 @@ def show_postlist_by_year(year, page=1):
     """Render a post list filtered by year"""
     year = int(year)
 
-    filter = and_(Post.pubdate > date(year, 1, 1),
-                  Post.pubdate <= date(year+1, 1, 1))
-    order = Post.pubdate.desc()
+    p_filter = and_(Post.pubdate > date(year, 1, 1),
+                    Post.pubdate <= date(year+1, 1, 1))
+    p_order = Post.pubdate.desc()
 
-    posts = get_posts(filter, order)
+    posts = get_posts(p_filter, p_order)
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_year', year=year)
 
@@ -236,9 +236,9 @@ def show_postlist_by_tag(tag, page=1):
     if tagobj is None:
         abort(404)
 
-    filter = Post.tags.contains(tagobj)
-    order = Post.pubdate.desc()
-    posts = get_posts(filter, order)
+    p_filter = Post.tags.contains(tagobj)
+    p_order = Post.pubdate.desc()
+    posts = get_posts(p_filter, p_order)
 
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_tag', tag=tag)
@@ -253,9 +253,9 @@ def show_postlist_by_username(username, page=1):
     if userobj is None:
         abort(404)
 
-    filter = Post.user==userobj
-    order = Post.pubdate.desc()
-    posts = get_posts(filter, order)
+    p_filter = Post.user == userobj
+    p_order = Post.pubdate.desc()
+    posts = get_posts(p_filter, p_order)
 
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_username', username=username)
@@ -265,16 +265,16 @@ def show_postlist_by_username(username, page=1):
 @viewer.view('show_atom')
 def show_atom():
     """Render atom feed with recent posts"""
-    order = Post.pubdate.desc()
-    posts = get_posts(None, order)[:app.config['FEEDITEMS']]
+    p_order = Post.pubdate.desc()
+    posts = get_posts(None, p_order)[:app.config['FEEDITEMS']]
 
     return viewer.render('atom.xml', posts=posts)
 
 @viewer.view('show_rss')
 def show_rss():
     """Render RSS feed with recent posts"""
-    order = Post.pubdate.desc()
-    posts = get_posts(None, order)[:app.config['FEEDITEMS']]
+    p_order = Post.pubdate.desc()
+    posts = get_posts(None, p_order)[:app.config['FEEDITEMS']]
 
     return viewer.render('rss.xml', posts=posts)
 # }}}
