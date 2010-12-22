@@ -82,7 +82,8 @@ def inject_pages():
 @app.context_processor
 def inject_recent_posts():
     """Add most recent post list to template context"""
-    recent_posts = posts_base().order_by(Post.pubdate.desc())[0:10]
+    order = Post.pubdate.desc()
+    recent_posts = get_posts(None, order)[0:10]
     return dict(recent_posts=recent_posts)
 
 @app.context_processor
@@ -151,7 +152,9 @@ def uploaded(filename):
 @viewer.view('index')
 def show_index():
     """Render the front page"""
-    posts = posts_base().order_by(Post.pubdate.desc())
+    order = Post.pubdate.desc()
+    posts = get_posts(None, order)
+
     # add paginator just in case someone would like a post list as homepage
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'],
                           1, 'show_postlist')
@@ -160,17 +163,21 @@ def show_index():
 @viewer.view('show_post')
 def show_post(slug, **kwargs):
     """Render a Post"""
-    query = posts_base().filter(Post.slug==slug)
+    filter = Post.slug==slug
+    query = get_posts(filter)
+
     # No result means the page doesn't exist
     if query.count() < 1:
         abort(404)
+
     post = query.first()
     return viewer.render('post.html', post=post[0])
 
 @viewer.view('show_page')
 def show_page(slug, **kwargs):
     """Render a Page"""
-    query = pages_base().filter(Page.slug==slug)
+    filter = Page.slug==slug
+    query = pages_base().filter(filter)
     # No result means the page doesn't exist
     if query.count() < 1:
         abort(404)
@@ -180,11 +187,10 @@ def show_page(slug, **kwargs):
 @viewer.view('show_postlist')
 def show_postlist(page=1):
     """Render a paginated post list"""
-    posts = posts_base().order_by(Post.pubdate.desc())
-    paginator = Paginator(posts,
-            app.config['ENTRIES_PER_PAGE'],
-            page,
-            'show_postlist')
+    order = Post.pubdate.desc()
+    posts = get_posts(None, order)
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
+                          'show_postlist')
     return viewer.render('post_list.html', posts=posts, paginator=paginator)
 
 @viewer.view('show_postlist_by_month_index')
