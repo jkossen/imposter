@@ -258,7 +258,7 @@ def save_post(post_id=None):
 
     flash(message)
 
-    return redirect(url_for('edit_post', post_id=post_id))
+    return redirect(url_for('edit_post', post_id=post.id))
 
 @viewer.view('save_new_page', methods=['POST'])
 @viewer.view('save_page', methods=['POST'])
@@ -309,7 +309,7 @@ def save_page(page_id=None):
 
     flash(message)
 
-    return redirect(url_for('edit_page', page_id=page_id))
+    return redirect(url_for('edit_page', page_id=page.id))
 
 # }}}
 
