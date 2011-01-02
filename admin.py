@@ -22,6 +22,7 @@ from models import User, Tag, Format, Status, Post, Page, post_tags
 from datetime import datetime
 from sqlalchemy.sql import and_
 from flaskjk import Viewer, hashify, slugify
+from frontend import filter_public
 
 import os
 import re
@@ -34,15 +35,8 @@ app.config.from_envvar('IMPOSTER_ADMIN_CONFIG', silent=True)
 db_session = DB(app.config['DATABASE']).get_session()
 viewer = Viewer(app, 'admin')
 
-# filter to make sure we only get posts which have status 'public'
-filter_public = and_(Post.status_id==Status.id,
-                 Status.value=='public',
-                 Post.user_id==User.id,
-                 Post.pubdate <= datetime.now()
-                 )
-
 # base query used in all frontend retrieve queries
-public_posts_base = db_session.query(Post, Status, User).filter(filter_public)
+public_posts_base = db_session.query(Post, Status, User).filter(filter_public())
 # }}}
 
 # Shortcut functions {{{
