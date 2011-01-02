@@ -72,7 +72,7 @@ ROUTES = {
     'show_postlist_by_tag_index': 'tag/<tag>/',
     'show_postlist_by_tag': 'tag/<tag>/<int:page>.html',
     'show_postlist_by_username': 'user/<username>/<int:page>.html',
-    'show_post': '<int:year>/<month>/<day>/<slug>.html',
+    'show_post': '<int:year>/<int:month>/<int:day>/<slug>.html',
     'show_page': 'page/<slug>.html',
     'show_rss': 'feed/rss/',
     'show_atom': 'feed/atom/',
