@@ -201,11 +201,11 @@ def show_postlist_by_month(year, month, page=1):
     month = int(month)
 
     # for now, Imposter only supports the years between 1970 and 3000 B.C.
-    if 1970 < year > 3000:
+    if year < 1970 or year > 3000:
         abort(404)
 
     # month should be between 1 and 12
-    if 1 < month > 12:
+    if month < 1 or month > 12:
         abort(404)
 
     start_of_month = date(year, month, 1)
@@ -226,7 +226,7 @@ def show_postlist_by_year(year, page=1):
     year = int(year)
 
     # for now, Imposter only supports the years between 1970 and 3000 B.C.
-    if 1970 < year > 3000:
+    if year < 1970 or year > 3000:
         abort(404)
 
     p_filter = and_(Post.pubdate > date(year, 1, 1),
