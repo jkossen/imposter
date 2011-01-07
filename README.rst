@@ -90,18 +90,19 @@ Requirements
 ~~~~~~~~~~~~
 Imposter requires the following software:
 
-* Python (developed with 2.5 provided with Debian Lenny)
-* Flask
-* Werkzeug
-* Jinja2
-* SQLAlchemy
-* SQLAlchemy-migrate (database schema versioning)
-* docutils (provides ReST support)
-* Markdown
+* `Python`_ (developed with 2.5 provided with Debian Lenny)
+* `Flask`_
+* `Werkzeug`_
+* `Jinja2`_
+* `SQLAlchemy`_
+* `SQLAlchemy-migrate`_ (database schema versioning)
+* `docutils`_ (provides ReST support)
+* `Markdown`_
+* `Flask-WTF`_ (`WTForms`_ extension for Flask)
 * Flaskjk_ (my own library with generic Flask functions)
 
-As Imposter uses SQLAlchemy for its database abstraction layer, make
-sure you have a database supported by SQLAlchemy available.
+As Imposter uses SQLAlchemy for its database abstraction layer, make sure you
+have a database supported by SQLAlchemy available.
 
 Installation Instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,6 +130,10 @@ concerning deployment.
 .. _Werkzeug: http://werkzeug.pocoo.org
 .. _Jinja2: http://jinja.pocoo.org
 .. _SQLAlchemy: http://www.sqlalchemy.org
+.. _SQLAlchemy-migrate: http://code.google.com/p/sqlalchemy-migrate/
+.. _docutils: http://docutils.sourceforge.net
 .. _ReST: http://docutils.sourceforge.net/rst.html
 .. _Markdown: http://daringfireball.net/projects/markdown
+.. _Flask-WTF: http://packages.python.org/Flask-WTF/
+.. _WTForms: http://wtforms.simplecodes.com
 .. _Flaskjk: http://github.com/jkossen/flaskjk
