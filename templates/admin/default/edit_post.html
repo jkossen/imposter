@@ -1,51 +1,41 @@
-{% extends "admin/default/layout.html" %} {% block body %}
+{% extends "admin/default/layout.html" %}
+{% from "admin/default/_formhelpers.html" import render_field %}
+{% block body %}
+
 <h1>{% if post %}{{ post.title }}{% endif %}</h1>
+
 <p>
     {% if session.username %}
     <form action="{% if post %}{{ url_for('save_post', post_id=post.id) }}{% else %}{{ url_for('save_post') }}{% endif %}" method=post class=save-post>
-        <table style="width:100%">
-            <tr><td>Title:</td><td><input type=text size=50 name=title value="{% if post %}{{ post.title }}{% endif %}"></td></tr>
-            <tr><td>Tags:</td><td><input type=text size=50 name=tags value="{% if post %}{% for tag in post.tags %}{{ tag }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}"></td></tr>
+        {{ form.csrf }}
+        <table>
+            {{ render_field(form.title) }}
+            {{ render_field(form.tags) }}
             {% if post %}
             <tr><td>Creation date:</td><td>{{ post.createdate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
             <tr><td>Last modified:</td><td>{{ post.lastmoddate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
             {% endif %}
-            <tr><td>Publication date:</td><td><input type="text" size="20" name="pubdate" value="{% if post %}{{ post.pubdate|strftime(config.POST_DATETIME_FORMAT) }}{% endif %}" /></td></tr>
-            <tr><td>Format:</td>
-                <td><select name="format">
-                        <option>Pick ...</option>
-                        {% for f in formats %}
-                        <option value="{{ f }}" {% if post and post.format == f %}selected="selected"{% endif %}>{{ f }}</option>
-                        {% endfor %}
-                    </select>
-            </td></tr>
-            <tr><td>Status:</td>
-                <td><select name="status">
-                        <option>Pick ...</option>
-                        {% for s in statuses %}
-                        <option value="{{ s }}" {% if post and post.status == s %}selected="selected"{% endif %}>{{ s }}</option>
-                        {% endfor %}
-                    </select>
-            </td></tr>
-            <tr><td>Summary:</td>
-                <td><textarea name=summary rows=10 cols=80>{% if post %}{{ post.summary or '' }}{% endif %}</textarea></td></tr>
-            <tr><td>Text:</td>
-                <td><textarea name=text rows=25 cols=80>{% if post %}{{ post.content }}{% endif %}</textarea></td></tr>
+            {{ render_field(form.pubdate) }}
+            {{ render_field(form.format) }}
+            {{ render_field(form.status) }}
+            {{ render_field(form.summary, rows=10, cols=80) }}
+            {{ render_field(form.content, rows=40, cols=80) }}
         </table>
         <input type="submit" value="Save" />
     </form>
     {% endif %}
 </p>
+
 <hr />
 
 <h2>Preview</h2>
 <h3>Summary</h3>
 <div id="preview_summary">
-{{ post.summary_html|safe }}
+    {% if post %}{{ post.summary_html|safe }}{% endif %}
 </div>
 
 <h3>Content</h3>
 <div id="preview_content">
-{{ post.content_html|safe }}
+    {% if post %}{{ post.content_html|safe }}{% endif %}
 </div>
 {% endblock %}

@@ -22,7 +22,9 @@ from models import User, Tag, Format, Status, Post, Page, post_tags
 from datetime import datetime
 from sqlalchemy.sql import and_
 from flaskjk import Viewer, hashify, slugify
+from flaskext.wtf import Form
 from frontend import filter_public
+from forms import PostForm
 
 import os
 import re
@@ -50,16 +52,6 @@ def login_required(fun):
         return fun(*args, **kwargs)
 
     return decorated_function
-
-def get_tag(value):
-    """Retrieve Tag object based on given String
-
-    If no such Tag object exists, return a new Tag object.
-    """
-    tag = Tag.query.filter(Tag.value==value).first()
-    if tag is None:
-        return Tag(value)
-    return tag
 
 def get_format(value):
     """Retrieve Format object based on given String"""
@@ -118,7 +110,7 @@ def login():
             user = userquery.first()
             session['username'] = user.username
             session['user_id'] = user.id
-            flash('You\'re now logged in')
+            flash('You\'re now logged in', category='info')
             return redirect(url_for('index'))
 
         error = 'Unknown user'
@@ -129,7 +121,7 @@ def login():
 def logout():
     """Clear the session"""
     session.clear()
-    flash('You were logged out')
+    flash('You were logged out', category='info')
     return redirect(url_for('index'))
 
 @viewer.view('index')
@@ -156,36 +148,26 @@ def recalculate_tagcounts():
 @viewer.view('new_post')
 @viewer.view('edit_post')
 @login_required
-def edit_post(post_id=None):
+def edit_post(post_id=None, post_form=None):
     """Render form to edit a Post"""
     formats = db_session.query(Format).all()
     statuses = db_session.query(Status).all()
     post = None
+    form = None
 
     if post_id:
         post = get_post(post_id)
 
+    if post_form is None:
+        form = PostForm(obj=post)
+    else:
+        form = post_form
+
     return viewer.render('edit_post.html',
-                           post=post,
-                           formats=formats,
-                           statuses=statuses)
-
-@viewer.view('new_page')
-@viewer.view('edit_page')
-@login_required
-def edit_page(page_id=None):
-    """Render form to edit a Page"""
-    formats = db_session.query(Format).all()
-    statuses = db_session.query(Status).all()
-    page = None
-
-    if page_id:
-        page = get_page(page_id)
-
-    return viewer.render('edit_page.html',
-                           page=page,
-                           formats=formats,
-                           statuses=statuses)
+                         form=form,
+                         post=post,
+                         formats=formats,
+                         statuses=statuses)
 
 @viewer.view('save_new_post', methods=['POST'])
 @viewer.view('save_post', methods=['POST'])
@@ -199,8 +181,15 @@ def save_post(post_id=None):
     message = 'Post updated'
     orig_tags = []
 
+    post_form = PostForm(request.form)
+
+    if not post_form.validate():
+        flash('ERROR: errors detected. Post NOT saved!', category='error')
+        return edit_post(post_id=post_id, post_form=post_form)
+
+    # test if we're creating a new post, or updating an existing one
     if post_id is None:
-        post = Post(request.form['title'], request.form['text'])
+        post = Post()
         post.status_id = 1
         post.user_id = session['user_id']
         post.createdate = datetime.now()
@@ -208,13 +197,8 @@ def save_post(post_id=None):
         post = get_post(post_id)
         orig_tags = [tag for tag in post.tags]
 
-    post.title = request.form['title']
-    post.summary = request.form['summary']
-    post.content = request.form['text']
+    post_form.populate_obj(post)
     post.lastmoddate = datetime.now()
-    post.format = get_format(request.form['format'])
-    post.pubdate = datetime.strptime(request.form['pubdate'].strip(),
-                                     '%Y-%m-%d %H:%M')
 
     # compile input to html
     post.compile(app.config['REPL_TAGS'])
@@ -227,10 +211,6 @@ def save_post(post_id=None):
         post.pubdate = datetime.now()
 
     post.status = get_status(request.form['status'])
-
-    sep = re.compile('\s*,\s*')
-    post.tags = [get_tag(tag) for tag \
-                 in sep.split(request.form['tags'].lower())]
 
     if post.slug is None:
         post.slug = slugify(post.title)
@@ -250,9 +230,26 @@ def save_post(post_id=None):
 
     db_session.commit()
 
-    flash(message)
+    flash(message, category='info')
 
     return redirect(url_for('edit_post', post_id=post.id))
+
+@viewer.view('new_page')
+@viewer.view('edit_page')
+@login_required
+def edit_page(page_id=None):
+    """Render form to edit a Page"""
+    formats = db_session.query(Format).all()
+    statuses = db_session.query(Status).all()
+    page = None
+
+    if page_id:
+        page = get_page(page_id)
+
+    return viewer.render('edit_page.html',
+                           page=page,
+                           formats=formats,
+                           statuses=statuses)
 
 @viewer.view('save_new_page', methods=['POST'])
 @viewer.view('save_page', methods=['POST'])
@@ -266,7 +263,7 @@ def save_page(page_id=None):
     message = 'Page updated'
 
     if page_id is None:
-        page = Page(request.form['title'], request.form['text'])
+        page = Page(request.form['title'], request.form['content'])
         page.status_id = 1
         page.user_id = session['user_id']
         page.createdate = datetime.now()
@@ -274,7 +271,7 @@ def save_page(page_id=None):
         page = get_page(page_id)
 
     page.title = request.form['title']
-    page.content = request.form['text']
+    page.content = request.form['content']
     page.lastmoddate = datetime.now()
     page.format = get_format(request.form['format'])
     page.pubdate = datetime.strptime(request.form['pubdate'].strip(),
