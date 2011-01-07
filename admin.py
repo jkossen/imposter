@@ -8,7 +8,7 @@
 
     Admin interface for the Imposter weblog app
 
-    :copyright: (c) 2010 by Jochem Kossen.
+    :copyright: (c) 2010-2011 by Jochem Kossen.
     :license: BSD, see LICENSE.txt for more details.
 """
 # }}}

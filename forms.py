@@ -6,7 +6,7 @@
 
     WTForms classes for creating forms and input validation.
 
-    :copyright: (c) 2010 by Jochem Kossen.
+    :copyright: (c) 2010-2011 by Jochem Kossen.
     :license: BSD, see LICENSE.txt for more details.
 """
 # }}}
