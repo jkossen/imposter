@@ -21,9 +21,9 @@ from database import DB
 from models import User, Tag, Format, Status, Post, Page
 from datetime import datetime
 from sqlalchemy.sql import and_
-from flaskjk import Viewer, Paginator, hashify, slugify
+from flaskjk import Viewer, Paginator, validate_password, slugify
 from frontend import filter_public
-from forms import PostForm, PageForm
+from forms import PostForm, PageForm, LoginForm
 # }}}
 
 # Initialization {{{
@@ -99,23 +99,37 @@ def static(filename):
 @viewer.view('login', methods=['POST'])
 def login():
     """Check user credentials and initialize session"""
-    error = None
+    # use a single error message for all failures so the "user" doesn't see what
+    # specifically went wrong
+    default_error = 'ERROR: Unknown user'
+
+    form = LoginForm()
+
     if request.method == 'POST':
-        hashedpassword = hashify(app.config['SECRET_KEY'],
-                                 request.form['password'])
-        userquery = User.query.filter(and_(
-            User.username==request.form['username'],
-            User.password==hashedpassword))
+        form = LoginForm(request.form)
+        if form.validate():
+            try:
+                user = User.query.filter(User.username==request.form['username'])\
+                        .one()
+            except:
+                flash(default_error, category='error')
+                return viewer.render('login.html', form=form)
 
-        if userquery.count() == 1:
-            user = userquery.first()
-            session['username'] = user.username
-            session['user_id'] = user.id
-            flash('You\'re now logged in', category='info')
-            return redirect(url_for('index'))
+            if validate_password(app.config['SECRET_KEY'],
+                                 request.form['password'],
+                                 user.password):
+                # We have a valid login, initialize session
+                session['username'] = user.username
+                session['user_id'] = user.id
 
-        error = 'Unknown user'
-    return viewer.render('login.html', error=error)
+                flash('Logged in successfully', category='info')
+                return redirect(url_for('index'))
+            else:
+                flash(default_error, category='error')
+        else:
+            flash('Incorrect form input', category='error')
+
+    return viewer.render('login.html', form=form)
 
 @viewer.view('logout')
 @login_required

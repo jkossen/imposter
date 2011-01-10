@@ -12,7 +12,7 @@
 # }}}
 
 # Imports {{{
-from flaskext.wtf import Form, TextField, DateTimeField, SelectField, TextAreaField, FieldList, Required
+from flaskext.wtf import Form, TextField, PasswordField, DateTimeField, SelectField, TextAreaField, FieldList, Required
 from wtforms.fields import Field
 from wtforms.widgets import TextInput
 from models import Format, Status, Tag
@@ -113,4 +113,8 @@ class PageForm(Form):
                          [Required(message='Please pick a status')])
     content = TextAreaField('Content', validators=\
                             [Required('Content is required.')])
+
+class LoginForm(Form):
+    username = TextField('Username', validators=[Required(message='Username is required.')])
+    password = PasswordField('Password', validators=[Required(message='Password is required.')])
 # }}}
