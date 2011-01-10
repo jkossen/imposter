@@ -18,16 +18,12 @@ from __future__ import with_statement
 from flask import Flask, request, session, abort, redirect, url_for, flash
 from functools import wraps
 from database import DB
-from models import User, Tag, Format, Status, Post, Page, post_tags
+from models import User, Tag, Format, Status, Post, Page
 from datetime import datetime
 from sqlalchemy.sql import and_
 from flaskjk import Viewer, hashify, slugify
-from flaskext.wtf import Form
 from frontend import filter_public
 from forms import PostForm, PageForm
-
-import os
-import re
 # }}}
 
 # Initialization {{{
@@ -80,6 +76,11 @@ def get_page(page_id):
         abort(404)
 
     return page
+
+def recalculate_tagcount(tag):
+    """Calculate how many times a given tag is used in public Posts"""
+    tag.count = public_posts_base.filter(Post.tags.contains(tag)).count()
+
 # }}}
 
 # Template filters {{{
@@ -134,12 +135,10 @@ def index():
         Page.user_id==session['user_id'])
     return viewer.render('index.html', posts=posts, pages=pages)
 
-def recalculate_tagcount(tag):
-    tag.count = public_posts_base.filter(Post.tags.contains(tag)).count()
-
 @viewer.view('recalculate_tagcounts')
 @login_required
 def recalculate_tagcounts():
+    """Recount all tag uses"""
     for tag in db_session.query(Tag):
         recalculate_tagcount(tag)
     db_session.commit()
@@ -283,7 +282,7 @@ def save_page(page_id=None):
     else:
         page = get_page(page_id)
 
-    page_form.populate_obj(post)
+    page_form.populate_obj(page)
     page.lastmoddate = datetime.now()
 
     # compile input to html
