@@ -91,6 +91,7 @@ Requirements
 Imposter requires the following software:
 
 * `Python`_ (developed with 2.5 provided with Debian Lenny)
+* `py-bcrypt`_ (used for password encryption using the Blowfish algorithm)
 * `Flask`_
 * `Werkzeug`_
 * `Jinja2`_
@@ -99,7 +100,7 @@ Imposter requires the following software:
 * `docutils`_ (provides ReST support)
 * `Markdown`_
 * `Flask-WTF`_ (`WTForms`_ extension for Flask)
-* Flaskjk_ (my own library with generic Flask functions)
+* `Flaskjk`_ (my own library with generic Flask functions)
 
 As Imposter uses SQLAlchemy for its database abstraction layer, make sure you
 have a database supported by SQLAlchemy available.
@@ -126,6 +127,7 @@ Check http://flask.pocoo.org/docs/deploying/ for more information
 concerning deployment.
 
 .. _Python: http://www.python.org
+.. _py-bcrypt: http://www.mindrot.org/projects/py-bcrypt/
 .. _Flask: http://flask.pocoo.org
 .. _Werkzeug: http://werkzeug.pocoo.org
 .. _Jinja2: http://jinja.pocoo.org
