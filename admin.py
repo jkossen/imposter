@@ -24,7 +24,7 @@ from sqlalchemy.sql import and_
 from flaskjk import Viewer, hashify, slugify
 from flaskext.wtf import Form
 from frontend import filter_public
-from forms import PostForm
+from forms import PostForm, PageForm
 
 import os
 import re
@@ -237,16 +237,23 @@ def save_post(post_id=None):
 @viewer.view('new_page')
 @viewer.view('edit_page')
 @login_required
-def edit_page(page_id=None):
+def edit_page(page_id=None, page_form=None):
     """Render form to edit a Page"""
     formats = db_session.query(Format).all()
     statuses = db_session.query(Status).all()
     page = None
+    form = None
 
     if page_id:
         page = get_page(page_id)
 
+    if page_form is None:
+        form = PageForm(obj=page)
+    else:
+        form = page_form
+
     return viewer.render('edit_page.html',
+                           form=form,
                            page=page,
                            formats=formats,
                            statuses=statuses)
@@ -262,6 +269,12 @@ def save_page(page_id=None):
     """
     message = 'Page updated'
 
+    page_form = PageForm(request.form)
+
+    if not page_form.validate():
+        flash('ERROR: errors detected. Page NOT saved!', category='error')
+        return edit_page(page_id=page_id, page_form=page_form)
+
     if page_id is None:
         page = Page(request.form['title'], request.form['content'])
         page.status_id = 1
@@ -270,12 +283,8 @@ def save_page(page_id=None):
     else:
         page = get_page(page_id)
 
-    page.title = request.form['title']
-    page.content = request.form['content']
+    page_form.populate_obj(post)
     page.lastmoddate = datetime.now()
-    page.format = get_format(request.form['format'])
-    page.pubdate = datetime.strptime(request.form['pubdate'].strip(),
-                                     '%Y-%m-%d %H:%M')
 
     # compile input to html
     page.compile(app.config['REPL_TAGS'])
