@@ -1,30 +1,30 @@
 {% extends "admin/default/layout.html" %}
 {% from "admin/default/_formhelpers.html" import render_field %}
+
+{% block extratitle %}{% if post %}Edit Post{% else %}New Post{% endif %} - {% endblock %}
+
 {% block body %}
 
-<h1>{% if post %}{{ post.title }}{% endif %}</h1>
-
-<p>
-    {% if session.username %}
-    <form action="{% if post %}{{ url_for('save_post', post_id=post.id) }}{% else %}{{ url_for('save_post') }}{% endif %}" method=post class=save-post>
-        {{ form.csrf }}
-        <table>
-            {{ render_field(form.title) }}
-            {{ render_field(form.tags) }}
-            {% if post %}
-            <tr><td>Creation date:</td><td>{{ post.createdate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
-            <tr><td>Last modified:</td><td>{{ post.lastmoddate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
-            {% endif %}
-            {{ render_field(form.pubdate) }}
-            {{ render_field(form.format) }}
-            {{ render_field(form.status) }}
-            {{ render_field(form.summary, rows=10, cols=80) }}
-            {{ render_field(form.content, rows=40, cols=80) }}
-        </table>
-        <input type="submit" value="Save" />
-    </form>
-    {% endif %}
-</p>
+<h1>{% if post %}{{ post.title }}{% else %}New Post{% endif %}</h1>
+{% if session.username %}
+<form action="{% if post %}{{ url_for('save_post', post_id=post.id) }}{% else %}{{ url_for('save_post') }}{% endif %}" method="post">
+    {{ form.csrf }}
+    <table style="max-width: 1500px;">
+        {{ render_field(form.title) }}
+        {{ render_field(form.tags) }}
+        {% if post %}
+        <tr><td>Creation date:</td><td>{{ post.createdate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
+        <tr><td>Last modified:</td><td>{{ post.lastmoddate|strftime(config.POST_DATETIME_FORMAT) }}</td></tr>
+        {% endif %}
+        {{ render_field(form.pubdate) }}
+        {{ render_field(form.format) }}
+        {{ render_field(form.status) }}
+        {{ render_field(form.summary, rows=10, cols=100) }}
+        {{ render_field(form.content, rows=40, cols=100) }}
+    </table>
+    <input type="submit" value="Save" />
+</form>
+{% endif %}
 
 <hr />
 

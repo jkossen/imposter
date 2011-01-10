@@ -1,24 +1,49 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"  />
-        <title>{{ config.TITLE }} Admin</title>
-        <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
+        <meta charset="UTF-8">
+        <title>{% block extratitle %}{% endblock %}{{ config.TITLE }} Admin</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='elastic/production/elastic.css') }}" type="text/css" media="all" />
+        <link rel="stylesheet" href="/static/elastic/production/elastic.print.css" type="text/css" media="print" /> 
+        <script src="{{ url_for('static', filename='elastic/jquery.js') }}" type="text/javascript" charset="utf-8"></script>
+        <script src="{{ url_for('static', filename='elastic/production/elastic.js') }}" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+        {% block extrahead %}{% endblock %}
     </head>
     <body>
-        <div class="page">
-            <h1><a href="/{{ config.PREFIX }}">{{ config.TITLE }} Admin</a></h1>
+        <div class="columns">
 
-            {% if session.user_id %}
-            <div class=metanav>
-                Welcome <strong>{{ session.username }}</strong>. <a href="{{ url_for('logout') }}">log out</a> | <a href="{{ url_for('edit_post') }}">new post</a> | <a href="{{ url_for('edit_page') }}">new page</a>
+            <!-- SIDEBAR -->
+            <div class="column fixed full-height sidebar" style="width: 200px;">
+                <div class="container">
+                    <h1><a href="/{{ config.PREFIX }}">{{ config.TITLE }} dashboard</a></h1>
+                    {% if session.user_id %}
+                    Welcome <strong>{{ session.username }}</strong>.
+
+                    <h2>Actions:</h2>
+                    <ul>
+                        <li><a href="{{ url_for('posts_list', page=1) }}">Posts</a></li>
+                        <li><a href="{{ url_for('pages_list', page=1) }}">Pages</a></li>
+                        <li><a href="{{ url_for('edit_post') }}">new post</a></li>
+                        <li><a href="{{ url_for('edit_page') }}">new page</a></li>
+                        <li><a href="{{ url_for('logout') }}">log out</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
             </div>
-            {% endif %}
+            <!-- /SIDEBAR -->
 
-            {% for category, message in get_flashed_messages(with_categories=true) %}
-            <div class="flash-{{ category }}">{{ message }}</div>
-            {% endfor %}
-            {% block body %}{% endblock %}
+            <!-- PAGE -->
+            <div class="column elastic full-height page">
+                <div class="container">
+                    {% for category, message in get_flashed_messages(with_categories=true) %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+            <!-- /PAGE -->
+
         </div>
     </body>
 </html>

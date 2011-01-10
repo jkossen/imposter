@@ -1,5 +1,6 @@
 {% extends "admin/default/layout.html" %}
 {% block body %}
+
 <h2>{{ config.ENTRIES_PER_PAGE }} most recent posts:</h2>
 <table style="width:100%;">
 <tr><th style="width:150px;">creation date</th><th style="width: 150px;">publication date</th><th>title</th></tr>
@@ -10,7 +11,9 @@
   {% endfor %}
 </table>
 <strong><a href="{{ url_for('posts_list', page=2) }}">more &raquo;</a></strong>
+
 <hr />
+
 <h2>{{ config.ENTRIES_PER_PAGE }} most recent pages:</h2>
 <table style="width:100%;">
 <tr><th style="width:150px;">creation date</th><th style="width:150px;">publication date</th><th>title</th></tr>

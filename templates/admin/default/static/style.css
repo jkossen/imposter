@@ -1,26 +1,66 @@
-body            { background: #404040; }
-body, table     { font-family: sans-serif; font-size: 12px; }
-table           { border-spacing: 0; }
-a, h1, h2       { color: #377BA8; }
-h1, h2          { font-family: 'Georgia', serif; margin: 0; }
-h1              { border-bottom: 2px solid #eee; }
-h2              { font-size: 1.2em; }
-th              { text-align: left; }
-td              { vertical-align: top; }
+body {
+    background-color: #ffffff;
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+}
 
-.page           { margin: 2em auto; border: 5px solid #ccc;
-                  padding: 0.8em; background: white; }
-.entries        { list-style: none; margin: 0; padding: 0; }
-.entries li     { margin: 0.8em 1.2em; }
-.entries li h2  { margin-left: -1em; }
-.add-entry      { font-size: 0.9em; border-bottom: 1px solid #ccc; }
-.add-entry dl   { font-weight: bold; }
-.metanav        { text-align: right; font-size: 0.8em; padding: 0.3em;
-                  margin-bottom: 1em; background: #fafafa; }
-.flash-info    { background: #a0ffa0; padding: 0.5em;
-                  border: 2px solid #00ff00; font-weight: bold; }
-.flash-error    { background: #ffa0a0; padding: 0.5em;
-                  border: 2px solid #ff0000; font-weight: bold; }
-.error, .errors { background: #F0D6D6; padding: 0.5em; border: 2px solid red; }
+td {
+    vertical-align: top;
+    padding-right: 15px;
+    padding-bottom: 5px;
+}
 
-.odd            { background: #dcf3ff; }
+.flash-info {
+    background: #a0ffa0;
+    padding: 0.5em;
+    border: 2px solid #00ff00;
+    font-weight: bold;
+}
+
+.flash-error {
+    background: #ffa0a0;
+    padding: 0.5em;
+    border: 2px solid #ff0000;
+    font-weight: bold;
+}
+
+.error, .errors {
+    background: #F0D6D6;
+    padding: 0.5em;
+    border: 2px solid red;
+}
+
+.errors li {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.errors {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.odd {
+    background: #dcf3ff;
+}
+
+.sidebar {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.sidebar a:link, .sidebar a:visited {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.page .container {
+    padding: 5px;
+}
+
+textarea {
+    width: 100%;
+}
