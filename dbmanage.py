@@ -21,7 +21,7 @@ from migrate.versioning.api import version_control, upgrade, downgrade, db_versi
 from sqlalchemy.sql import and_
 from models import User, Tag, Status, Format, Post, post_tags
 from database import DB
-from flaskjk import hashify, slugify
+from flaskjk import encrypt_password, slugify
 from datetime import datetime
 
 import sys
@@ -75,7 +75,7 @@ def add_initial_data():
     password = getpass.getpass(prompt='Please enter the admin password: ')
 
     # add user to database
-    u = User(username, hashify(app.config['SECRET_KEY'], password))
+    u = User(username, encrypt_password(app.config['SECRET_KEY'], password))
     db_session.add(u)
 
     # create statuses
