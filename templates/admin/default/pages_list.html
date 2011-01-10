@@ -2,7 +2,7 @@
 {% block body %}
 <h2>Pages</h2>
 <div class="meta">{% include 'admin/default/_paginator.html' %}</div>
-<table style="width:100%;">
+<table style="width:100%;" class="postslist">
 <tr><th style="width:150px;">creation date</th><th style="width: 150px;">publication date</th><th>title</th></tr>
   {% for page in paginator.entries %}
     <tr class="{{ loop.cycle('odd', 'even') }}"><td>{{ page.createdate|strftime(config.POST_DATETIME_FORMAT) }}</td><td>{% if page.pubdate %}{{ page.pubdate|strftime(config.POST_DATETIME_FORMAT) }}{% endif %}</td><td><a href="{{ url_for('edit_page', page_id=page.id) }}">{{ page.title }}</a></td></tr>

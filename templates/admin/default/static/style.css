@@ -3,10 +3,38 @@ body {
     font-family: Tahoma, Arial, Verdana, sans-serif;
 }
 
+a:link, a:visited {
+    color: #4040ff;
+}
+
+.paginator {
+    background-color: #efefef;
+    color: #202020;
+    padding: 2px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-bottom: 25px;
+    border-radius: 1em 1em;
+    -moz-border-radius: 1em 1em;
+    -khtml-border-radius: 1em 1em;
+    -webkit-border-radius: 1em 1em;
+}
+
+.paginator a:link, .paginator a:visited {
+    text-decoration: none;
+}
+
 td {
     vertical-align: top;
     padding-right: 15px;
     padding-bottom: 5px;
+}
+th {
+    text-align: left;
+}
+
+.postslist tr {
+    line-height: 2em;
 }
 
 .flash-info {
