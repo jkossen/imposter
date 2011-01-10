@@ -61,6 +61,6 @@ ul.errors {
     padding: 5px;
 }
 
-textarea {
+textarea, input[type=text], input[type=password] {
     width: 100%;
 }
