@@ -10,7 +10,7 @@
     <li><em>No posts found.</em>
   {% endfor %}
 </table>
-<strong><a href="{{ url_for('posts_list', page=2) }}">older posts &raquo;</a></strong>
+<strong><a href="{{ url_for('posts_list', page=1) }}">more &raquo;</a></strong>
 
 <hr />
 
@@ -23,5 +23,5 @@
     <li><em>No pages found.</em>
   {% endfor %}
 </table>
-<strong><a href="{{ url_for('pages_list', page=2) }}">older pages &raquo;</a></strong>
+<strong><a href="{{ url_for('pages_list', page=1) }}">more &raquo;</a></strong>
 {% endblock %}
