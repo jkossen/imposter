@@ -62,31 +62,15 @@ class TagListField(Field):
 
 class FormatField(SelectField):
     """A SelectField for picking a Format"""
-    def pre_validate(self, form):
-        for v, _ in self.choices:
-            if self.data.value == v:
-                break
-        else:
-            raise ValueError(self.gettext(u'Not a valid choice.'))
-
-    def process_formdata(self, value):
-        if value:
-            self.data = get_format(value[0])
+    def populate_obj(self, obj, name):
+        """Data comes in as a String, but the targetet object expects a Format object"""
+        setattr(obj, name, get_format(self.data))
 
 class StatusField(SelectField):
     """A SelectField for picking a Status"""
-    def pre_validate(self, form):
-        for v, _ in self.choices:
-            if self.data.value == v:
-                break
-        else:
-            raise ValueError(self.gettext(u'Not a valid choice.'))
-
-    def process_formdata(self, value):
-        if value:
-            self.data = get_status(value[0])
-        else:
-            self.data = None
+    def populate_obj(self, obj, name):
+        """Data comes in as a String, but the targetet object expects a Status object"""
+        setattr(obj, name, get_status(self.data))
 
 class PostForm(Form):
     """Form for the Post objects from Imposter.models"""
@@ -98,7 +82,7 @@ class PostForm(Form):
                             validators=\
                             [Required(message='Wrong date or date format.')])
     format = FormatField('Format', choices=[('markdown','Markdown'),
-                                            ('rest', 'REStructuredText')],
+                                            ('rest', 'ReStructuredText')],
                          validators=\
                          [Required(message='Please pick a format')])
     status = StatusField('Status', choices=[('draft','Draft'),
@@ -108,6 +92,25 @@ class PostForm(Form):
                          [Required(message='Please pick a status')])
     summary = TextAreaField('Summary', validators=\
                             [Required('Summary is required.')])
+    content = TextAreaField('Content', validators=\
+                            [Required('Content is required.')])
+
+class PageForm(Form):
+    """Form for the Page objects from Imposter.models"""
+    title = TextField('Title', validators=\
+                      [Required(message='Title is required.')])
+    pubdate = DateTimeField('Publication date', format='%Y-%m-%d %H:%M',
+                            validators=\
+                            [Required(message='Wrong date or date format.')])
+    format = FormatField('Format', choices=[('markdown','Markdown'),
+                                            ('rest', 'ReStructuredText')],
+                         validators=\
+                         [Required(message='Please pick a format')])
+    status = StatusField('Status', choices=[('draft','Draft'),
+                                            ('private','Private'),
+                                            ('public','Public')],
+                         validators=\
+                         [Required(message='Please pick a status')])
     content = TextAreaField('Content', validators=\
                             [Required('Content is required.')])
 # }}}
