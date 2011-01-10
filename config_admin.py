@@ -16,6 +16,9 @@ DATABASE = 'postgresql://imposter:imposter@localhost/imposter'
 # Theme
 THEME = 'default'
 
+# How many posts doe you want to show in a list?
+ENTRIES_PER_PAGE = 10
+
 # Show summaries instead of full posts in feed content, post lists and front page?
 SUMMARIES = True
 
@@ -57,6 +60,8 @@ ROUTES = {
     'logout': 'logout/',
     'new_post': 'post/new/edit/',
     'new_page': 'page/new/edit/',
+    'pages_list': 'pages/<int:page>.html',
+    'posts_list': 'posts/<int:page>.html',
     'edit_post': 'post/<int:post_id>/edit/',
     'edit_page': 'page/<int:page_id>/edit/',
     'save_new_post': 'post/new/save/',
