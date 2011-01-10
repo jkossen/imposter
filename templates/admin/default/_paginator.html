@@ -1,0 +1,29 @@
+<div class="paginator">
+    {% if paginator.pages == 1 %}
+    Page 1 of 1
+    {% else %}
+    {% if paginator.page == 1 %}
+    Page: &laquo; first
+    {% else %}
+    Page: <a href="{{ paginator.first }}">&laquo; first</a>
+    {% endif %}
+    {%- if paginator.has_previous %}
+    <a href="{{ paginator.previous }}">&lsaquo; prev</a>
+    {%- else %}
+    <span class="inactive"> &lsaquo; prev</span>{% endif %}
+    | {{ paginator.page }} /
+    {% if paginator.has_next %}
+    <a href="{{ paginator.last }}">{{ paginator.pages }}</a> |
+    {% else %}
+    {{ paginator.pages }} |
+    {% endif %}
+    {% if paginator.has_next %}
+    <a href="{{ paginator.next }}">next &rsaquo;</a>
+    <a href="{{ paginator.last }}">last &raquo;</a>
+    {%- else %}
+    <span class="inactive">next &rsaquo;</span>
+    <span class="inactive">last &raquo;</span>
+    {% endif %}
+    {% endif %}
+</div>
+

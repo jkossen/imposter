@@ -21,7 +21,7 @@ from database import DB
 from models import User, Tag, Format, Status, Post, Page
 from datetime import datetime
 from sqlalchemy.sql import and_
-from flaskjk import Viewer, hashify, slugify
+from flaskjk import Viewer, Paginator, hashify, slugify
 from frontend import filter_public
 from forms import PostForm, PageForm
 # }}}
@@ -124,6 +124,28 @@ def logout():
     session.clear()
     flash('You were logged out', category='info')
     return redirect(url_for('index'))
+
+@viewer.view('posts_list')
+@login_required
+def posts_list(page=1):
+    """Paginated view of all posts"""
+    p_order = Post.pubdate.desc()
+    posts = db_session.query(Post).filter(
+        Post.user_id==session['user_id']).order_by(Post.pubdate.desc())
+    paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
+                          'posts_list')
+    return viewer.render('posts_list.html', posts=posts, paginator=paginator)
+
+@viewer.view('pages_list')
+@login_required
+def pages_list(page=1):
+    """Paginated view of all pages"""
+    p_order = Page.pubdate.desc()
+    pages = db_session.query(Page).filter(
+        Page.user_id==session['user_id']).order_by(Page.pubdate.desc())
+    paginator = Paginator(pages, app.config['ENTRIES_PER_PAGE'], page,
+                          'pages_list')
+    return viewer.render('pages_list.html', pages=pages, paginator=paginator)
 
 @viewer.view('index')
 @login_required
