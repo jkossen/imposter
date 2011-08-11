@@ -92,7 +92,7 @@ def strftime(value, format='%a, %d %b %Y %H:%M:%S %Z'):
 
 # Views {{{
 @viewer.view('static_files')
-def static(filename):
+def static_files(filename):
     """Send static files such as style sheets, JavaScript, etc."""
     return viewer.static(filename)
 

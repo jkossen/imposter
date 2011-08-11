@@ -3,11 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block extratitle %}{% endblock %}{{ config.TITLE }} Admin</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='elastic/production/elastic.css') }}" type="text/css" media="all" />
-        <link rel="stylesheet" href="/static/elastic/production/elastic.print.css" type="text/css" media="print" /> 
-        <script src="{{ url_for('static', filename='elastic/jquery.js') }}" type="text/javascript" charset="utf-8"></script>
-        <script src="{{ url_for('static', filename='elastic/production/elastic.js') }}" type="text/javascript" charset="utf-8"></script>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static_files', filename='elastic/production/elastic.css') }}" type="text/css" media="all" />
+        <link rel="stylesheet" href="/static_files/elastic/production/elastic.print.css" type="text/css" media="print" /> 
+        <script src="{{ url_for('static_files', filename='elastic/jquery.js') }}" type="text/javascript" charset="utf-8"></script>
+        <script src="{{ url_for('static_files', filename='elastic/production/elastic.js') }}" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static_files', filename='style.css') }}" />
         {% block extrahead %}{% endblock %}
     </head>
     <body>
