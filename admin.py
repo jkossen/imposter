@@ -37,7 +37,7 @@ viewer = Viewer(app, 'admin')
 public_posts_base = db_session.query(Post, Status, User).filter(filter_public())
 # }}}
 
-# Shortcut functions {{{
+# Helper functions {{{
 def login_required(fun):
     """Decorator for functions which require an authorized user"""
     @wraps(fun)
@@ -109,8 +109,8 @@ def login():
         form = LoginForm(request.form)
         if form.validate():
             try:
-                user = User.query.filter(User.username==request.form['username'])\
-                        .one()
+                user = User.query.filter(
+                    User.username==request.form['username']).one()
             except:
                 flash(default_error, category='error')
                 return viewer.render('login.html', form=form)
