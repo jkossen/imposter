@@ -140,8 +140,13 @@ def tf_to_html(content, format):
 
 # Views {{{
 @viewer.view('static_files')
-def static(filename):
-    """Send static files such as style sheets, JavaScript, etc."""
+def static_files(filename):
+    """Send static files such as style sheets, JavaScript, etc.
+
+    NOTE: this is not called 'static' in order to not conflict with Flask's
+    static handling which would override this and thus not take config['PREFIX']
+    in account.
+    """
     return viewer.static(filename)
 
 @viewer.view('uploads')
@@ -187,11 +192,13 @@ def show_page(slug, **kwargs):
 @viewer.view('show_postlist')
 def show_postlist(page=1):
     """Render a paginated post list"""
+    title = "Postlist"
     p_order = Post.pubdate.desc()
     posts = get_posts(None, p_order)
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist')
-    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator,
+                        title=title)
 
 @viewer.view('show_postlist_by_month_index')
 @viewer.view('show_postlist_by_month')
@@ -214,10 +221,14 @@ def show_postlist_by_month(year, month, page=1):
     p_order = Post.pubdate.desc()
     posts = get_posts(p_filter, p_order)
 
+    month_name = date(1900,month,1).strftime('%B')
+
+    title = "Posted in %s, %d" % (month_name, year)
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_month', year=year, month=month)
 
-    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator,
+                         title=title)
 
 @viewer.view('show_postlist_by_year_index')
 @viewer.view('show_postlist_by_year')
@@ -233,11 +244,13 @@ def show_postlist_by_year(year, page=1):
                     Post.pubdate <= date(year+1, 1, 1))
     p_order = Post.pubdate.desc()
 
+    title = "Posted in %d" % year
     posts = get_posts(p_filter, p_order)
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_year', year=year)
 
-    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator,
+                         title=title)
 
 @viewer.view('show_postlist_by_tag_index')
 @viewer.view('show_postlist_by_tag')
@@ -252,10 +265,12 @@ def show_postlist_by_tag(tag, page=1):
     p_order = Post.pubdate.desc()
     posts = get_posts(p_filter, p_order)
 
+    title = "Posts tagged \"%s\"" % tag
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_tag', tag=tag)
 
-    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator,
+                         title=title)
 
 @viewer.view('show_postlist_by_username')
 def show_postlist_by_username(username, page=1):
@@ -269,10 +284,12 @@ def show_postlist_by_username(username, page=1):
     p_order = Post.pubdate.desc()
     posts = get_posts(p_filter, p_order)
 
+    title = "Posts by %s" % username
     paginator = Paginator(posts, app.config['ENTRIES_PER_PAGE'], page,
                           'show_postlist_by_username', username=username)
 
-    return viewer.render('post_list.html', posts=posts, paginator=paginator)
+    return viewer.render('post_list.html', posts=posts, paginator=paginator,
+                         title=title)
 
 @viewer.view('show_atom')
 def show_atom():
